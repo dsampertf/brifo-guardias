@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BRIFO – Guardias Extraordinàries / Guardias Extraordinarias</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --fire: #E8400A;
+    --fire-dark: #B83008;
+    --fire-light: #FF6B35;
+    --gold: #F5A623;
+    --dark: #0D1117;
+    --dark2: #161B22;
+    --dark3: #21262D;
+    --dark4: #30363D;
+    --text: #E6EDF3;
+    --text2: #8B949E;
+    --text3: #6E7681;
+    --green: #3FB950;
+    --red: #F85149;
+    --blue: #58A6FF;
+    --yellow: #E3B341;
+    --border: #30363D;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* HEADER */
+  .app-header {
+    background: linear-gradient(135deg, var(--dark2) 0%, #1a0a00 100%);
+    border-bottom: 2px solid var(--fire);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(232,64,10,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .header-logo {
+    width: 52px;
+    height: 52px;
+    background: var(--fire);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(232,64,10,0.4);
+  }
+  .header-titles { flex: 1; }
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .header-subtitle {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 3px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-lang {
+    display: flex;
+    gap: 6px;
+  }
+  .lang-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .lang-btn.active, .lang-btn:hover {
+    border-color: var(--fire);
+    color: var(--fire);
+  }
+  .admin-link {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .admin-link:hover { border-color: var(--text2); color: var(--text2); }
+
+  /* MAIN */
+  .app-main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+
+  /* GUARDIA CARD */
+  .guardia-card {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--fire);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .guardia-card.closed { border-left-color: var(--text3); }
+  .guardia-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(232,64,10,0.15);
+    border: 1px solid rgba(232,64,10,0.3);
+    color: var(--fire-light);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .guardia-badge.closed-badge {
+    background: rgba(110,118,129,0.15);
+    border-color: rgba(110,118,129,0.3);
+    color: var(--text3);
+  }
+  .guardia-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--fire-light);
+    animation: pulse 1.5s infinite;
+  }
+  .guardia-badge.closed-badge .dot { background: var(--text3); animation: none; }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .guardia-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+  .guardia-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .guardia-field { }
+  .guardia-field-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 3px;
+  }
+  .guardia-field-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .guardia-field-value.highlight { color: var(--gold); }
+
+  /* DEADLINE */
+  .deadline-bar {
+    background: var(--dark3);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .deadline-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+  .deadline-value { font-size: 14px; font-weight: 600; color: var(--text); }
+  .countdown {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+  .countdown.urgent { background: rgba(248,81,73,0.2); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .countdown.ok { background: rgba(63,185,80,0.2); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+  .countdown.warning { background: rgba(227,179,65,0.2); color: var(--yellow); border: 1px solid rgba(227,179,65,0.3); }
+
+  /* FORM */
+  .form-section {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .form-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .form-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+  .form-label { font-size: 12px; color: var(--text2); font-weight: 500; letter-spacing: 0.5px; }
+  .form-input {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 10px 14px;
+    font-size: 15px;
+    font-family: 'Barlow', sans-serif;
+    transition: border-color 0.2s;
+    outline: none;
+    width: 100%;
+  }
+  .form-input:focus { border-color: var(--fire); }
+  .form-input::placeholder { color: var(--text3); }
+  .form-input.error { border-color: var(--red); }
+
+  /* BUTTONS */
+  .btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--fire);
+    color: white;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--fire-light); box-shadow: 0 0 20px rgba(232,64,10,0.4); }
+  .btn-primary:disabled { background: var(--dark4); color: var(--text3); cursor: not-allowed; box-shadow: none; }
+  .btn-secondary {
+    background: var(--dark3);
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--text2); color: var(--text); }
+  .btn-success { background: var(--green); color: white; width: 100%; justify-content: center; margin-top: 8px; }
+  .btn-success:hover { background: #4dc961; }
+
+  /* ALERT BOXES */
+  .alert {
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .alert-green { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3); color: #7ee787; }
+  .alert-red { background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3); color: #ffa198; }
+  .alert-yellow { background: rgba(227,179,65,0.1); border: 1px solid rgba(227,179,65,0.3); color: #f0c040; }
+  .alert-blue { background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.3); color: #79c0ff; }
+
+  /* PRIORITY BADGE */
+  .priority-box {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .priority-rank {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--fire);
+    line-height: 1;
+  }
+  .priority-rank span { font-size: 20px; color: var(--text3); }
+  .priority-info { flex: 1; }
+  .priority-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .priority-hours { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .priority-hours strong { color: var(--gold); }
+
+  /* ADMIN PANEL */
+  .admin-panel {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--blue);
+    border-radius: 10px;
+    padding: 24px;
+  }
+  .admin-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--blue);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .table-wrap { overflow-x: auto; margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: var(--dark3);
+    padding: 10px 12px;
+    text-align: left;
+    color: var(--text2);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--dark3);
+    color: var(--text);
+    vertical-align: middle;
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .tag-green { background: rgba(63,185,80,0.2); color: var(--green); }
+  .tag-red { background: rgba(248,81,73,0.2); color: var(--red); }
+  .tag-yellow { background: rgba(227,179,65,0.2); color: var(--yellow); }
+  .tag-blue { background: rgba(88,166,255,0.2); color: var(--blue); }
+  .tag-gray { background: rgba(110,118,129,0.2); color: var(--text2); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+  .tab.active { color: var(--fire); border-bottom-color: var(--fire); }
+  .tab:hover { color: var(--text2); }
+
+  /* NO GUARDIA */
+  .no-guardia {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text3);
+  }
+  .no-guardia .icon { font-size: 48px; margin-bottom: 16px; }
+  .no-guardia h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; color: var(--text2); margin-bottom: 8px; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* STATS ROW */
+  .stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stat-box {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    flex: 1;
+    min-width: 120px;
+  }
+  .stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: var(--text); }
+  .stat-value.fire { color: var(--fire); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.blue { color: var(--blue); }
+
+  /* FOOTER */
+  .app-footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text3);
+    font-size: 12px;
+    border-top: 1px solid var(--dark3);
+    margin-top: 40px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--fire);
+    border-radius: 10px;
+    padding: 28px;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+  }
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none; border: none;
+    color: var(--text3); font-size: 20px; cursor: pointer;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  @media (max-width: 600px) {
+    .header-inner { padding: 14px 16px; }
+    .header-title { font-size: 20px; }
+    .app-main { padding: 20px 12px; }
+    .guardia-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ─── DATA ───────────────────────────────────────────────────────────────────
+</script>
+<script>
+const PERSONAL_DATA = [{"id":1,"nombre":"ABOLAFIO PEREZ, RUBEN","dni":"73657352J","categoria":"ESPECIALISTA","brifo":"BRIFO-53-A","turno":1,"email":"ruaboper@bombersdv.es","pin":"56085"},{"id":2,"nombre":"ADELANTADO PIERA, ANTONIO","dni":"20164627K","categoria":"ESPECIALISTA","brifo":"BRIFO-36-B","turno":6,"email":"anadepie@bombersdv.es","pin":"83641"},{"id":3,"nombre":"ADRIA PEIRO, JOSE MIGUEL","dni":"73760480D","categoria":"ESPECIALISTA","brifo":"BRIFO-13-B","turno":6,"email":"joadrpei@bombersdv.es","pin":"62015"},{"id":4,"nombre":"AGUILAR BURDALO, GUSTAVO","dni":"44509638S","categoria":"ESPECIALISTA","brifo":"BRIFO-57-B","turno":4,"email":"guagubur@bombersdv.es","pin":"73912"},{"id":5,"nombre":"AGUSTI MAÑEZ, JESUS FRANCISCO","dni":"85088253Y","categoria":"ESPECIALISTA","brifo":"BRIFO-17-B","turno":2,"email":"jeaguman@bombersdv.es","pin":"47597"},{"id":6,"nombre":"ALBALAT CALATAYUD, GERARDO","dni":"20452721V","categoria":"CONDUCTOR","brifo":"BRIFO-25-B","turno":8,"email":"gealbcal@bombersdv.es","pin":"30793"},{"id":7,"nombre":"ALCALA ORTIZ, LUIS MIGUEL","dni":"29164247V","categoria":"CONDUCTOR","brifo":"BRIFO-15-A","turno":3,"email":"lualcort@bombersdv.es","pin":"63265"},{"id":8,"nombre":"ALONSO MOLINA, OSCAR","dni":"22593507D","categoria":"CAPATAZ","brifo":"BRIFO-11-B","turno":2,"email":"osalomol@bombersdv.es","pin":"51943"},{"id":9,"nombre":"ALVAREZ VIDAL, CARLES","dni":"20448278J","categoria":"ESPECIALISTA","brifo":"BRIFO-37-A","turno":5,"email":"caalvvid@bombersdv.es","pin":"00766"},{"id":10,"nombre":"AMADO FERRIZ, GIL","dni":"18421794J","categoria":"ESPECIALISTA","brifo":"BRIFO-51-B","turno":6,"email":"giamafer@bombersdv.es","pin":"37744"},{"id":11,"nombre":"AMER GOMEZ, JOAN BAPTISTA","dni":"45796636W","categoria":"ESPECIALISTA","brifo":"BRIFO-14-A","turno":7,"email":"joamegom@bombersdv.es","pin":"42080"},{"id":12,"nombre":"ANDRES ARGENTE, RAFAEL","dni":"20411576L","categoria":"COORDINADOR","brifo":"DELTA 12-:::::","turno":4,"email":"randres@bombersdv.es","pin":"89888"},{"id":13,"nombre":"ANDRES GONZALES, ANGEL","dni":"18441639D","categoria":"ESPECIALISTA","brifo":"BRIFO-51-A","turno":5,"email":"","pin":"89800"},{"id":14,"nombre":"ANDRES SANFELIU, JORGE","dni":"22594965H","categoria":"ESPECIALISTA","brifo":"BRIFO-11-B","turno":2,"email":"joandsan@bombersdv.es","pin":"83971"},{"id":15,"nombre":"ANTON CALVO, FELIX","dni":"18448747X","categoria":"ESPECIALISTA","brifo":"BRIFO-52-A","turno":1,"email":"feantcal@bombersdv.es","pin":"51469"},{"id":16,"nombre":"ANTON PEREZ, CARLOS","dni":"18432892W","categoria":"COORDINADOR","brifo":"DELTA 51-:::::","turno":5,"email":"canton@bombersdv.es","pin":"51053"},{"id":17,"nombre":"APARICIO BARBERAN, ISAAC","dni":"73587403F","categoria":"ESPECIALISTA","brifo":"BRIFO-36-B","turno":6,"email":"isapabar@bombersdv.es","pin":"15117"},{"id":18,"nombre":"APARICIO BLASCO, MONSERRAT","dni":"18436933H","categoria":"ESPECIALISTA","brifo":"BRIFO-51-B","turno":6,"email":"moapabla@bombersdv.es","pin":"74198"},{"id":19,"nombre":"APARICIO GARCIA, ALBERTO","dni":"85304772A","categoria":"COORDINADOR","brifo":"DELTA 31-:::::","turno":7,"email":"aaparicio@bombersdv.es","pin":"37915"},{"id":20,"nombre":"ARGENTE PEREZ, MARCOS VICENTE","dni":"20421878V","categoria":"ESPECIALISTA","brifo":"BRIFO-34-B","turno":4,"email":"maargper@bombersdv.es","pin":"24199"},{"id":21,"nombre":"ARGILES APARICIO, JAVIER","dni":"18429471P","categoria":"CONDUCTOR","brifo":"BRIFO-51-A","turno":5,"email":"jaargapa@bombersdv.es","pin":"92275"},{"id":22,"nombre":"ARNAU BELLVIS, RICARDO JOSE","dni":"20421926L","categoria":"ESPECIALISTA","brifo":"BRIFO-28-A","turno":3,"email":"riarnbel@bombersdv.es","pin":"35538"},{"id":23,"nombre":"ARNERO RESCALVO, OSCAR","dni":"20447601A","categoria":"ESPECIALISTA","brifo":"BRIFO-27-A","turno":5,"email":"osarnres@bombersdv.es","pin":"54447"},{"id":24,"nombre":"ATIENZA CARRIO, MIGUEL","dni":"48435461Z","categoria":"CAPATAZ","brifo":"BRIFO-54-B","turno":4,"email":"miaticar@bombersdv.es","pin":"88267"},{"id":25,"nombre":"ATIENZA MINGUEZ, PABLO","dni":"24359514F","categoria":"CAPATAZ","brifo":"BRIFO-54-A","turno":3,"email":"paatimin@bombersdv.es","pin":"86555"},{"id":26,"nombre":"BADENES MAHIQUES, JOSE","dni":"20057973H","categoria":"ESPECIALISTA","brifo":"BRIFO-23-A","turno":1,"email":"jobadmah@bombersdv.es","pin":"28446"},{"id":27,"nombre":"BARON PEREZ, RUBEN","dni":"73561897P","categoria":"ESPECIALISTA","brifo":"BRIFO-42-A","turno":5,"email":"rubarper@bombersdv.es","pin":"58986"},{"id":28,"nombre":"BATALLER ALCARAZ, JOSE","dni":"52711940B","categoria":"ESPECIALISTA","brifo":"BRIFO-25-B","turno":8,"email":"jobatalc@bombersdv.es","pin":"76641"},{"id":29,"nombre":"BELDA SANZ, MIGUEL","dni":"73549507S","categoria":"CAPATAZ","brifo":"BRIFO-25-B","turno":8,"email":"mibelsan@bombersdv.es","pin":"61247"},{"id":30,"nombre":"BELLVIS GINER, JESUS","dni":"20431342M","categoria":"CAPATAZ","brifo":"BRIFO-28-A","turno":3,"email":"jebelgin@bombersdv.es","pin":"07409"},{"id":31,"nombre":"BENEYTO ALBERO, JUAN FRANCISCO","dni":"52714499V","categoria":"CAPATAZ","brifo":"BRIFO-22-B","turno":4,"email":"jubenalb@bombersdv.es","pin":"45718"},{"id":32,"nombre":"BENITEZ ARNAS, MIGUEL","dni":"73763111H","categoria":"ESPECIALISTA","brifo":"BRIFO-11-A","turno":1,"email":"mibenarn@bombersdv.es","pin":"83896"},{"id":33,"nombre":"BERGA ROZALEN, ALFREDO","dni":"85088243L","categoria":"ESPECIALISTA","brifo":"BRIFO-12-A","turno":7,"email":"alberroz@bombersdv.es","pin":"83194"},{"id":34,"nombre":"BERNABEU BONO, MIQUEL","dni":"20449759E","categoria":"CONDUCTOR","brifo":"BRIFO-37-B","turno":6,"email":"miberbon@bombersdv.es","pin":"26022"},{"id":35,"nombre":"BERNAT BELDA, MANUEL","dni":"20410539V","categoria":"CONDUCTOR","brifo":"BRIFO-22-A","turno":3,"email":"maberbel@bombersdv.es","pin":"66122"},{"id":36,"nombre":"BLASCO ARGILES, MIGUEL","dni":"18428767V","categoria":"ESPECIALISTA","brifo":"BRIFO-51-A","turno":5,"email":"miblaarg@bombersdv.es","pin":"25899"},{"id":37,"nombre":"BLASCO BLASCO, LAURA","dni":"18442492B","categoria":"ESPECIALISTA","brifo":"BRIFO-51-A","turno":5,"email":"lablabla@bombersdv.es","pin":"29263"},{"id":38,"nombre":"BOIL GARCIA, JOAQUIN MIGUEL","dni":"52725568T","categoria":"ESPECIALISTA","brifo":"BRIFO-15-B","turno":4,"email":"joboigar@bombersdv.es","pin":"78441"},{"id":39,"nombre":"BOLINCHES SILVAJE, DAVID","dni":"20822411M","categoria":"ESPECIALISTA","brifo":"BRIFO-21-A","turno":5,"email":"dabolsil@bombersdv.es","pin":"33089"},{"id":40,"nombre":"BONACHO ADALID, RAUL","dni":"18443579V","categoria":"CAPATAZ","brifo":"BRIFO-57-A","turno":3,"email":"rabonada@bombersdv.es","pin":"61845"},{"id":41,"nombre":"BONMATI GARCIA, SERGIO","dni":"20437021A","categoria":"CONDUCTOR","brifo":"BRIFO-34-B","turno":4,"email":"sebongar@bombersdv.es","pin":"27485"},{"id":42,"nombre":"BOSCH SANCHEZ, VICENTE","dni":"48593600M","categoria":"ESPECIALISTA","brifo":"BRIFO-17-A","turno":1,"email":"vibossan@bombersdv.es","pin":"04736"},{"id":43,"nombre":"BOU CASTILLO, ANGEL FRANCISCO","dni":"29181615C","categoria":"CONDUCTOR","brifo":"BRIFO-17-B","turno":2,"email":"anboucas@bombersdv.es","pin":"65684"},{"id":44,"nombre":"BRIZ ROIG, JUAN JOSE","dni":"20833969V","categoria":"ESPECIALISTA","brifo":"BRIFO-21-A","turno":5,"email":"jubriroi@bombersdv.es","pin":"94295"},{"id":45,"nombre":"BRU MINGUEZ, CONSTANTINO","dni":"73779625H","categoria":"CONDUCTOR","brifo":"BRIFO-36-A","turno":5,"email":"cobrumin@bombersdv.es","pin":"07237"},{"id":46,"nombre":"BURGOS DEL TORO, CAROLINA","dni":"24392481S","categoria":"CONDUCTOR","brifo":"BRIFO-55-B","turno":8,"email":"caburdel@bombersdv.es","pin":"35577"},{"id":47,"nombre":"BURGUERA MONTAGUD, JUAN CARLOS","dni":"20808730D","categoria":"ESPECIALISTA","brifo":"BRIFO-26-B","turno":2,"email":"juburmon@bombersdv.es","pin":"93186"},{"id":48,"nombre":"CABALLERO VERDEJO, MARIA SOLEDAD","dni":"73565963A","categoria":"ESPECIALISTA","brifo":"BRIFO-32-B","turno":4,"email":"macabver@bombersdv.es","pin":"58131"},{"id":49,"nombre":"CABANILLES INZA, RAFAEL","dni":"73549572B","categoria":"CAPATAZ","brifo":"BRIFO-26-B","turno":2,"email":"racabinz@bombersdv.es","pin":"26747"},{"id":50,"nombre":"CABAÑAS CASTAÑO, OSCAR","dni":"18456175D","categoria":"CAPATAZ","brifo":"BRIFO-52-A","turno":1,"email":"oscabcas@bombersdv.es","pin":"05903"},{"id":51,"nombre":"CABRERA MARTINEZ, LUCIO","dni":"20434759H","categoria":"CAPATAZ","brifo":"BRIFO-41-A","turno":7,"email":"lucabmar@bombersdv.es","pin":"62413"},{"id":52,"nombre":"CALATAYUD BELLVER, JOSE LUIS","dni":"20415398T","categoria":"ESPECIALISTA","brifo":"BRIFO-22-B","turno":4,"email":"jocalbel@bombersdv.es","pin":"87037"},{"id":53,"nombre":"CALVO GARCIA, JOSE VICENTE","dni":"20446962P","categoria":"ESPECIALISTA","brifo":"BRIFO-21-B","turno":6,"email":"jocalgar@bombersdv.es","pin":"71269"},{"id":54,"nombre":"CAMARA PEREZ, VICENTE","dni":"85087893Z","categoria":"CONDUCTOR","brifo":"BRIFO-36-B","turno":6,"email":"vicamper@bombersdv.es","pin":"46638"},{"id":55,"nombre":"CAMARASA GRAU, MANUEL","dni":"20413940Z","categoria":"CAPATAZ","brifo":"BRIFO-38-B","turno":8,"email":"macamgra@bombersdv.es","pin":"39752"},{"id":56,"nombre":"CAMARASA TORTOSA, COSME","dni":"20425642D","categoria":"ESPECIALISTA","brifo":"BRIFO-22-B","turno":4,"email":"cocamtor@bombersdv.es","pin":"31246"},{"id":57,"nombre":"CARBONELL BARRIUSO, VICENTE JOSE","dni":"73567683K","categoria":"ESPECIALISTA","brifo":"BRIFO-23-A","turno":1,"email":"vicarbar@bombersdv.es","pin":"97746"},{"id":58,"nombre":"CARMONA SORRIBAS, DIEGO","dni":"20016548Q","categoria":"CAPATAZ","brifo":"BRIFO-26-A","turno":1,"email":"dicarsor@bombersdv.es","pin":"57202"},{"id":59,"nombre":"CARRASCO FABIAN, MARIO","dni":"48311144N","categoria":"CONDUCTOR","brifo":"BRIFO-11-A","turno":1,"email":"macarfab@bombersdv.es","pin":"40696"},{"id":60,"nombre":"CARRION HERNANDEZ, JUAN","dni":"85078840T","categoria":"CONDUCTOR","brifo":"BRIFO-47-A","turno":1,"email":"jucarher@bombersdv.es","pin":"29443"},{"id":61,"nombre":"CASADO GENOVES, MARIA JOSE","dni":"22578488D","categoria":"ESPECIALISTA","brifo":"BRIFO-13-A","turno":5,"email":"macasgen@bombersdv.es","pin":"12508"},{"id":62,"nombre":"CASINO ASENSIO, ROMAN JESUS","dni":"18431752N","categoria":"CAPATAZ","brifo":"BRIFO-57-B","turno":4,"email":"rocasase@bombersdv.es","pin":"92377"},{"id":63,"nombre":"CASTELLOTE MURGUI, MONICA","dni":"44504903H","categoria":"ESPECIALISTA","brifo":"BRIFO-55-B","turno":8,"email":"mocasmur@bombersdv.es","pin":"39564"},{"id":64,"nombre":"CEBELLAN CEBELLAN, AMANDO","dni":"73554532A","categoria":"CONDUCTOR","brifo":"BRIFO-56-A","turno":7,"email":"amcebceb@bombersdv.es","pin":"07856"},{"id":65,"nombre":"CERDA GALIANA, VICTOR MANUEL","dni":"20434110J","categoria":"ESPECIALISTA","brifo":"BRIFO-25-A","turno":7,"email":"vicergal@bombersdv.es","pin":"33876"},{"id":66,"nombre":"CERDA UREÑA, JOSE RAMON","dni":"22561989R","categoria":"ESPECIALISTA","brifo":"BRIFO-44-A","turno":3,"email":"jocerure@bombersdv.es","pin":"63935"},{"id":67,"nombre":"CHAFER CALABUIG, MARCOS","dni":"20433751E","categoria":"CAPATAZ","brifo":"BRIFO-37-B","turno":6,"email":"machacal@bombersdv.es","pin":"79714"},{"id":68,"nombre":"CLEMENTE DE AGUIDA, RUY","dni":"24464344A","categoria":"ESPECIALISTA","brifo":"BRIFO-45-B","turno":6,"email":"ruclede@bombersdv.es","pin":"02967"},{"id":69,"nombre":"CLEMENTE MARTINEZ, ANTONIO","dni":"85079254T","categoria":"CAPATAZ","brifo":"BRIFO-45-B","turno":6,"email":"anclemar@bombersdv.es","pin":"86012"},{"id":70,"nombre":"COLLADO ARJONA, MARIA BELEN","dni":"52716939L","categoria":"ESPECIALISTA","brifo":"BRIFO-22-B","turno":4,"email":"macolarj@bombersdv.es","pin":"06757"},{"id":71,"nombre":"COLOMER CORRECHER, LUIS MANUEL","dni":"22568818E","categoria":"ESPECIALISTA","brifo":"BRIFO-32-A","turno":3,"email":"lucolcor@bombersdv.es","pin":"35457"},{"id":72,"nombre":"CONTRERAS MARTI, DOMINGO","dni":"20031279G","categoria":"ESPECIALISTA","brifo":"BRIFO-23-B","turno":2,"email":"doconmar@bombersdv.es","pin":"20980"},{"id":73,"nombre":"CONTRERAS PEREZ, JOSE LUIS","dni":"85081340Q","categoria":"CAPATAZ","brifo":"BRIFO-41-B","turno":8,"email":"joconper@bombersdv.es","pin":"29957"},{"id":74,"nombre":"CORGNOLO, CLAUDE","dni":"X1570436L","categoria":"CONDUCTOR","brifo":"BRIFO-23-A","turno":1,"email":"clcorcla@bombersdv.es","pin":"80298"},{"id":75,"nombre":"COSTA CARPENA, PEDRO JOSE","dni":"29188582H","categoria":"ESPECIALISTA","brifo":"BRIFO-15-A","turno":3,"email":"pecoscar@bombersdv.es","pin":"13525"},{"id":76,"nombre":"COSTA PUENTE, JOSE ANTONIO","dni":"73581262F","categoria":"ESPECIALISTA","brifo":"BRIFO-32-A","turno":3,"email":"jocospue@bombersdv.es","pin":"75267"},{"id":77,"nombre":"CUBEL GALLARTE, JULIO","dni":"48306431Z","categoria":"ESPECIALISTA","brifo":"BRIFO-56-A","turno":7,"email":"jucubgal@bombersdv.es","pin":"17541"},{"id":78,"nombre":"CUCO GIMENO, DAVID","dni":"22570371B","categoria":"ESPECIALISTA","brifo":"BRIFO-18-A","turno":5,"email":"dacucgim@bombersdv.es","pin":"03793"},{"id":79,"nombre":"DE DIOS LUZ, JOSE ANGEL","dni":"18448974F","categoria":"ESPECIALISTA","brifo":"BRIFO-52-A","turno":1,"email":"jodedio@bombersdv.es","pin":"49329"},{"id":80,"nombre":"DE HUERTAS TARAZAGA, CARLOS","dni":"52652222R","categoria":"CAPATAZ","brifo":"BRIFO-19-A","turno":5,"email":"cadehue@bombersdv.es","pin":"29380"},{"id":81,"nombre":"DEVES MURCIA, ENRIQUE","dni":"73555109M","categoria":"ESPECIALISTA","brifo":"BRIFO-43-A","turno":1,"email":"endevmur@bombersdv.es","pin":"71470"},{"id":82,"nombre":"DOBON BENEITO, JOAQUIN","dni":"20425408M","categoria":"ESPECIALISTA","brifo":"BRIFO-26-A","turno":1,"email":"jodobben@bombersdv.es","pin":"14882"},{"id":83,"nombre":"DOLZ COLL, JOSE","dni":"24326419D","categoria":"ESPECIALISTA","brifo":"BRIFO-14-B","turno":8,"email":"jodolcol@bombersdv.es","pin":"38441"},{"id":84,"nombre":"DOMINGO COSIN, MARIA","dni":"04580202M","categoria":"CAPATAZ","brifo":"BRIFO-52-B","turno":2,"email":"madomcos@bombersdv.es","pin":"34899"},{"id":85,"nombre":"DOMINGO ZANON, JOSE ALFONSO","dni":"85079930D","categoria":"ESPECIALISTA","brifo":"BRIFO-49-A","turno":3,"email":"jodomzan@bombersdv.es","pin":"19374"},{"id":86,"nombre":"DOMINGUEZ TURIS, CARLOS","dni":"20007468K","categoria":"ESPECIALISTA","brifo":"BRIFO-24-A","turno":7,"email":"cadomtur@bombersdv.es","pin":"06530"},{"id":87,"nombre":"DURAN GUERRERO, JOSE ANTONIO","dni":"52643188Y","categoria":"CAPATAZ","brifo":"BRIFO-44-B","turno":4,"email":"jodurgue@bombersdv.es","pin":"40320"},{"id":88,"nombre":"EGEA GINER, JUAN ANTONIO","dni":"20422811F","categoria":"ESPECIALISTA","brifo":"BRIFO-22-A","turno":3,"email":"juegegin@bombersdv.es","pin":"51623"},{"id":89,"nombre":"ENGUIX ROVIRA, JUAN","dni":"20002417F","categoria":"CAPATAZ","brifo":"BRIFO-29-B","turno":8,"email":"juengrov@bombersdv.es","pin":"29669"},{"id":90,"nombre":"ESCOLA ESCRIHUELA, SALVADOR","dni":"20815186W","categoria":"ESPECIALISTA","brifo":"BRIFO-21-B","turno":6,"email":"saescesc@bombersdv.es","pin":"52415"},{"id":91,"nombre":"ESTARLICH ESPAÑA, FRANCISCO JOAQUIN","dni":"20430851C","categoria":"CAPATAZ","brifo":"BRIFO-35-B","turno":8,"email":"frestesp@bombersdv.es","pin":"99160"},{"id":92,"nombre":"ESTARLICH ESTELA, ANTONIO","dni":"20441927X","categoria":"ESPECIALISTA","brifo":"BRIFO-21-B","turno":6,"email":"anestest@bombersdv.es","pin":"30855"},{"id":93,"nombre":"ESTARLICH GARCIA, RAUL","dni":"20832495S","categoria":"CAPATAZ","brifo":"BRIFO-18-A","turno":5,"email":"raestgar@bombersdv.es","pin":"05733"},{"id":94,"nombre":"ESTARLICH QUESADA, RAUL","dni":"20840206K","categoria":"CONDUCTOR","brifo":"BRIFO-21-B","turno":6,"email":"raestque@bombersdv.es","pin":"00541"},{"id":95,"nombre":"ESTEBAN CLOQUELL, PABLO","dni":"25379019Z","categoria":"ESPECIALISTA","brifo":"BRIFO-19-B","turno":6,"email":"paestclo@bombersdv.es","pin":"01959"},{"id":96,"nombre":"ESTEVE MASQUEFA, JUAN LUIS","dni":"25422947N","categoria":"CONDUCTOR","brifo":"BRIFO-15-B","turno":4,"email":"juestmas@bombersdv.es","pin":"41925"},{"id":97,"nombre":"ESTEVE VENDRELL, SALVADOR","dni":"20780158A","categoria":"ESPECIALISTA","brifo":"BRIFO-39-B","turno":2,"email":"saestven@bombersdv.es","pin":"66575"},{"id":98,"nombre":"FALCO GONZALEZ, JUAN CARLOS","dni":"36086891Y","categoria":"CAPATAZ","brifo":"BRIFO-11-A","turno":1,"email":"jufalgon@bombersdv.es","pin":"89287"},{"id":99,"nombre":"FAULI MERLI, MANUEL","dni":"44799531Q","categoria":"CONDUCTOR","brifo":"BRIFO-14-A","turno":7,"email":"mafaumer@bombersdv.es","pin":"64354"},{"id":100,"nombre":"FAUS CALABUIG, EUSEBIO","dni":"20029786Y","categoria":"ESPECIALISTA","brifo":"BRIFO-23-B","turno":2,"email":"eufaucal@bombersdv.es","pin":"41687"},{"id":101,"nombre":"FERRANDO SAUS, EMILIO JOSE","dni":"20442667Z","categoria":"CONDUCTOR","brifo":"BRIFO-28-A","turno":3,"email":"emfersau@bombersdv.es","pin":"16234"},{"id":102,"nombre":"FERRE PEREZ, JOSE CARLOS","dni":"52676403D","categoria":"ESPECIALISTA","brifo":"BRIFO-12-B","turno":8,"email":"joferper@bombersdv.es","pin":"63281"},{"id":103,"nombre":"FLORES CAMPILLO, FRANCISCO","dni":"44853783B","categoria":"CAPATAZ","brifo":"BRIFO-42-A","turno":5,"email":"frflocam@bombersdv.es","pin":"99210"},{"id":104,"nombre":"FLORES CAMPILLO, MARIA NOELIA","dni":"73575207R","categoria":"CONDUCTOR","brifo":"BRIFO-42-A","turno":5,"email":"maflocam@bombersdv.es","pin":"41298"},{"id":105,"nombre":"FLORES CARCEL, IVAN","dni":"73577603M","categoria":"ESPECIALISTA","brifo":"BRIFO-43-B","turno":2,"email":"ivflocar@bombersdv.es","pin":"86839"},{"id":106,"nombre":"FORTEA MORENO, ALEJANDRO","dni":"45632529T","categoria":"ESPECIALISTA","brifo":"BRIFO-46-B","turno":4,"email":"alformor@bombersdv.es","pin":"15780"},{"id":107,"nombre":"FRIGOLS JORDA, FERNANDO","dni":"20419842M","categoria":"CAPATAZ","brifo":"BRIFO-31-B","turno":2,"email":"fefrijor@bombersdv.es","pin":"30310"},{"id":108,"nombre":"FURIO SANTAMARIA, MARIA DEL MAR","dni":"20795285L","categoria":"COORDINADOR","brifo":"DELTA 11-:::::","turno":1,"email":"mfurio@bombersdv.es","pin":"99030"},{"id":109,"nombre":"GABRIEL FERNANDEZ, VICENTE","dni":"48586045V","categoria":"CONDUCTOR","brifo":"BRIFO-44-A","turno":3,"email":"vigabfer@bombersdv.es","pin":"74222"},{"id":110,"nombre":"GARCIA CARRERO, FRANCISCO JAVIER","dni":"24357114E","categoria":"CONDUCTOR","brifo":"BRIFO-15-B","turno":4,"email":"frgarcar@bombersdv.es","pin":"88640"},{"id":111,"nombre":"GARCIA GARCIA, JOSE MARIA","dni":"20812003Q","categoria":"CAPATAZ","brifo":"BRIFO-21-B","turno":6,"email":"jogargar@bombersdv.es","pin":"72846"},{"id":112,"nombre":"GARCIA GUERRERO, JOSE MARIA","dni":"53006206S","categoria":"ESPECIALISTA","brifo":"BRIFO-24-A","turno":7,"email":"jogargue@bombersdv.es","pin":"81732"},{"id":113,"nombre":"GARCIA LOPEZ, JUAN TOMAS","dni":"29182694H","categoria":"ESPECIALISTA","brifo":"BRIFO-14-B","turno":8,"email":"jugarlop@bombersdv.es","pin":"06630"},{"id":114,"nombre":"GARCIA NAVARRO, ANDRES","dni":"73554546V","categoria":"CONDUCTOR","brifo":"BRIFO-45-A","turno":5,"email":"angarnav@bombersdv.es","pin":"70095"},{"id":115,"nombre":"GARCIA NAVARRO, MONSERRAT","dni":"20433951S","categoria":"ESPECIALISTA","brifo":"BRIFO-38-A","turno":7,"email":"mogarnav@bombersdv.es","pin":"84688"},{"id":116,"nombre":"GARCIA PEREZ, JOSE MANUEL","dni":"73543471M","categoria":"CONDUCTOR","brifo":"BRIFO-38-A","turno":7,"email":"jogarper@bombersdv.es","pin":"96159"},{"id":117,"nombre":"GARCIA PINO, RUBEN","dni":"73575430V","categoria":"ESPECIALISTA","brifo":"BRIFO-45-A","turno":5,"email":"rugarpin@bombersdv.es","pin":"00915"},{"id":118,"nombre":"GARCIA PONS, JULIO","dni":"73549949C","categoria":"CAPATAZ","brifo":"BRIFO-37-A","turno":5,"email":"jugarpon@bombersdv.es","pin":"17098"},{"id":119,"nombre":"GARCIA ROBERTO, LAURA","dni":"22578123N","categoria":"ESPECIALISTA","brifo":"BRIFO-44-B","turno":4,"email":"lagarrob@bombersdv.es","pin":"45983"},{"id":120,"nombre":"GARCIA SANCHEZ, IVAN","dni":"48438149B","categoria":"CAPATAZ","brifo":"BRIFO-16-A","turno":3,"email":"ivgarsan@bombersdv.es","pin":"99614"},{"id":121,"nombre":"GARCIA VILLAPLANA, MARTA","dni":"20434793Y","categoria":"ESPECIALISTA","brifo":"BRIFO-34-A","turno":3,"email":"magarvil@bombersdv.es","pin":"55474"},{"id":122,"nombre":"GARCIA-GASCO CONDE, JULIAN","dni":"70341366Y","categoria":"CAPATAZ","brifo":"BRIFO-53-A","turno":1,"email":"jugarcon@bombersdv.es","pin":"95246"},{"id":123,"nombre":"GARIJO AGUADO, JUAN FRANCISCO","dni":"52783405S","categoria":"COORDINADOR","brifo":"DELTA 27-:::::","turno":3,"email":"jgarijo@bombersdv.es","pin":"51441"},{"id":124,"nombre":"GARIJO MARTINEZ, CARLOS","dni":"85086383E","categoria":"CAPATAZ","brifo":"BRIFO-53-B","turno":2,"email":"cagarmar@bombersdv.es","pin":"79131"},{"id":125,"nombre":"GARRIGA DE LA ASUNCION, ALBERT","dni":"73500495Q","categoria":"ESPECIALISTA","brifo":"BRIFO-14-A","turno":7,"email":"algarde@bombersdv.es","pin":"36347"},{"id":126,"nombre":"GARZON ALARCO, JAVIER","dni":"44509724D","categoria":"ESPECIALISTA","brifo":"BRIFO-31-B","turno":2,"email":"jagarala@bombersdv.es","pin":"64586"},{"id":127,"nombre":"GENOVES ZARAPICO, DAVID","dni":"29190361A","categoria":"CAPATAZ","brifo":"BRIFO-14-A","turno":7,"email":"dagenzar@bombersdv.es","pin":"03102"},{"id":128,"nombre":"GIL TORMO, DAVID","dni":"20453693T","categoria":"ESPECIALISTA","brifo":"BRIFO-37-B","turno":6,"email":"dagiltor@bombersdv.es","pin":"61529"},{"id":129,"nombre":"GILABERT MARTINEZ, MARIA LUZ","dni":"73578801F","categoria":"CONDUCTOR","brifo":"BRIFO-42-B","turno":6,"email":"magilmar@bombersdv.es","pin":"47629"},{"id":130,"nombre":"GIMENEZ BERNAD, OSCAR","dni":"73563545T","categoria":"CAPATAZ","brifo":"BRIFO-17-B","turno":2,"email":"osgimber@bombersdv.es","pin":"39447"},{"id":131,"nombre":"GOMEZ FIOL, JORGE","dni":"26764156E","categoria":"CAPATAZ","brifo":"BRIFO-33-A","turno":5,"email":"jogomfio@bombersdv.es","pin":"17500"},{"id":132,"nombre":"GOMEZ MARTINEZ, ANGEL","dni":"20427010C","categoria":"ESPECIALISTA","brifo":"BRIFO-15-A","turno":3,"email":"angommar@bombersdv.es","pin":"02532"},{"id":133,"nombre":"GOMEZ MARTINEZ, MARIA CARMEN","dni":"25403796C","categoria":"ESPECIALISTA","brifo":"BRIFO-49-A","turno":3,"email":"mcgommar@bombersdv.es","pin":"05038"},{"id":134,"nombre":"GONZALEZ CRUCES, JOSE ANTONIO","dni":"29441031L","categoria":"ESPECIALISTA","brifo":"BRIFO-43-A","turno":1,"email":"jogoncru@bombersdv.es","pin":"81220"},{"id":135,"nombre":"GONZALEZ VIDAL, ANTONIO","dni":"35097144H","categoria":"ESPECIALISTA","brifo":"BRIFO-13-A","turno":5,"email":"angonvid@bombersdv.es","pin":"88502"},{"id":136,"nombre":"GOZALBES MORACHO, JOSE RAMON","dni":"20415097K","categoria":"CONDUCTOR","brifo":"BRIFO-23-B","turno":2,"email":"jogozmor@bombersdv.es","pin":"23542"},{"id":137,"nombre":"GRAU CALATAYUD, JOSE VICENTE","dni":"20439291L","categoria":"CONDUCTOR","brifo":"BRIFO-34-B","turno":4,"email":"jogracal@bombersdv.es","pin":"87502"},{"id":138,"nombre":"GRAU CARRION, JUAN JOSE","dni":"53097710W","categoria":"ESPECIALISTA","brifo":"BRIFO-47-A","turno":1,"email":"jugracar@bombersdv.es","pin":"97775"},{"id":139,"nombre":"GRAU PEREZ, JESUS","dni":"85305011N","categoria":"CAPATAZ","brifo":"BRIFO-15-A","turno":3,"email":"jegraper@bombersdv.es","pin":"27324"},{"id":140,"nombre":"GREGORIO MONTON, VICENTE JAVIER","dni":"20150754V","categoria":"CONDUCTOR","brifo":"BRIFO-54-B","turno":4,"email":"vigremon@bombersdv.es","pin":"58182"},{"id":141,"nombre":"GUAITA GARCIA, JAVIER","dni":"44881890N","categoria":"ESPECIALISTA","brifo":"BRIFO-43-A","turno":1,"email":"jaguagar@bombersdv.es","pin":"24379"},{"id":142,"nombre":"GUEROLA ALBORCH, VICENTE","dni":"20009830Z","categoria":"CAPATAZ","brifo":"BRIFO-26-A","turno":1,"email":"viguealb@bombersdv.es","pin":"55801"},{"id":143,"nombre":"GUITARTE CASANOVA, MARTA","dni":"29188526P","categoria":"ESPECIALISTA","brifo":"BRIFO-12-A","turno":7,"email":"maguicas@bombersdv.es","pin":"62310"},{"id":144,"nombre":"HERNANDEZ BONET, JOSE ANTONIO","dni":"20444530Z","categoria":"ESPECIALISTA","brifo":"BRIFO-31-A","turno":1,"email":"joherbon@bombersdv.es","pin":"60025"},{"id":145,"nombre":"HERNANDEZ HERRERO, CARLOS","dni":"18453433G","categoria":"ESPECIALISTA","brifo":"BRIFO-57-A","turno":3,"email":"caherher@bombersdv.es","pin":"14226"},{"id":146,"nombre":"HERNANDEZ TORRES, SERGIO","dni":"24378713R","categoria":"ESPECIALISTA","brifo":"BRIFO-11-A","turno":1,"email":"sehertor@bombersdv.es","pin":"74946"},{"id":147,"nombre":"HERRERO HERRERO, DAVID","dni":"33459024G","categoria":"CAPATAZ","brifo":"BRIFO-56-A","turno":7,"email":"daherher@bombersdv.es","pin":"31165"},{"id":148,"nombre":"HERRERO ROGER, RICARDO","dni":"24359817B","categoria":"ESPECIALISTA","brifo":"BRIFO-53-A","turno":1,"email":"riherrog@bombersdv.es","pin":"21122"},{"id":149,"nombre":"HUESCA GARCIA, JOSE MANUEL","dni":"20430298L","categoria":"CAPATAZ","brifo":"BRIFO-34-B","turno":4,"email":"johuegar@bombersdv.es","pin":"49792"},{"id":150,"nombre":"IBAÑEZ CLEMENTE, FELIX","dni":"22699077D","categoria":"ESPECIALISTA","brifo":"BRIFO-45-B","turno":6,"email":"feibacle@bombersdv.es","pin":"63144"},{"id":151,"nombre":"JIMENEZ ROLDAN, ANTONIO","dni":"40981944S","categoria":"CONDUCTOR","brifo":"BRIFO-56-B","turno":8,"email":"anjimrol@bombersdv.es","pin":"77442"},{"id":152,"nombre":"JORQUES CIRUJEDA, JOSE VICENTE","dni":"21642966N","categoria":"ESPECIALISTA","brifo":"BRIFO-39-A","turno":1,"email":"jojorcir@bombersdv.es","pin":"16750"},{"id":153,"nombre":"JUAN BORRAS, JOSE TOMAS","dni":"20421181X","categoria":"CONDUCTOR","brifo":"BRIFO-32-B","turno":4,"email":"jojuabor@bombersdv.es","pin":"24795"},{"id":154,"nombre":"JUAN JORGE, ARACELI","dni":"53204412F","categoria":"ESPECIALISTA","brifo":"BRIFO-15-B","turno":4,"email":"arjuajor@bombersdv.es","pin":"11370"},{"id":155,"nombre":"JUAREZ ARGENTE, VICENTE CARLOS","dni":"20417266M","categoria":"ESPECIALISTA","brifo":"BRIFO-34-B","turno":4,"email":"vijuaarg@bombersdv.es","pin":"77458"},{"id":156,"nombre":"LAMARCA GARCIA, FERNANDO","dni":"24397358Q","categoria":"ESPECIALISTA","brifo":"BRIFO-41-A","turno":7,"email":"felamgar@bombersdv.es","pin":"95363"},{"id":157,"nombre":"LAMARCA GARCIA, ROCIO","dni":"48436783W","categoria":"ESPECIALISTA","brifo":"BRIFO-45-A","turno":5,"email":"rolamgar@bombersdv.es","pin":"37866"},{"id":158,"nombre":"LECHIGUERO ESCRIBANO, JUAN JOSE","dni":"05194338H","categoria":"ESPECIALISTA","brifo":"BRIFO-32-A","turno":3,"email":"julecesc@bombersdv.es","pin":"36914"},{"id":159,"nombre":"LEON DOMINGO, BENILDE","dni":"18426214V","categoria":"CONDUCTOR","brifo":"BRIFO-57-B","turno":4,"email":"beleodom@bombersdv.es","pin":"23552"},{"id":160,"nombre":"LEON DOMINGO, MARIA JESUS","dni":"18426213Q","categoria":"CAPATAZ","brifo":"BRIFO-51-B","turno":6,"email":"maleodom@bombersdv.es","pin":"23912"},{"id":161,"nombre":"LLORENS FERRI, RICARDO","dni":"20442175M","categoria":"ESPECIALISTA","brifo":"BRIFO-31-A","turno":1,"email":"rillofer@bombersdv.es","pin":"76644"},{"id":162,"nombre":"LLOVERA VILLANUEVA, FRANCISCO","dni":"73574203D","categoria":"ESPECIALISTA","brifo":"BRIFO-53-B","turno":2,"email":"frllovil@bombersdv.es","pin":"96148"},{"id":163,"nombre":"LLOVERA VILLANUEVA, MARIA JOSE","dni":"52709776D","categoria":"CONDUCTOR","brifo":"BRIFO-53-B","turno":2,"email":"mallovil@bombersdv.es","pin":"99384"},{"id":164,"nombre":"LOPEZ BORDERA, JUAN ANTONIO","dni":"20432484C","categoria":"ESPECIALISTA","brifo":"BRIFO-25-A","turno":7,"email":"julopbor@bombersdv.es","pin":"79214"},{"id":165,"nombre":"LOPEZ CANO, FRANCISCO","dni":"85304543G","categoria":"CAPATAZ","brifo":"BRIFO-25-A","turno":7,"email":"frlopcan@bombersdv.es","pin":"62284"},{"id":166,"nombre":"LOPEZ CHACON, JAVIER","dni":"20437054J","categoria":"ESPECIALISTA","brifo":"BRIFO-37-B","turno":6,"email":"jalopcha@bombersdv.es","pin":"51356"},{"id":167,"nombre":"LOPEZ CUBEL, JOSE NICOLAS","dni":"29163050Q","categoria":"CAPATAZ","brifo":"BRIFO-56-B","turno":8,"email":"jolopcub@bombersdv.es","pin":"48877"},{"id":168,"nombre":"LOPEZ GONZALEZ, MANUEL","dni":"73563712Y","categoria":"ESPECIALISTA","brifo":"BRIFO-43-B","turno":2,"email":"malopgon@bombersdv.es","pin":"77934"},{"id":169,"nombre":"LOPEZ LOPEZ, JULIAN","dni":"85084545R","categoria":"ESPECIALISTA","brifo":"BRIFO-41-B","turno":8,"email":"juloplop@bombersdv.es","pin":"97178"},{"id":170,"nombre":"LOPEZ ORTIZ, JULIAN","dni":"04574468K","categoria":"CAPATAZ","brifo":"BRIFO-57-B","turno":4,"email":"juloport@bombersdv.es","pin":"00744"},{"id":171,"nombre":"LOPEZ SAEZ, JOSE CRISTIAN","dni":"73581416T","categoria":"ESPECIALISTA","brifo":"BRIFO-36-B","turno":6,"email":"jolopsae@bombersdv.es","pin":"47511"},{"id":172,"nombre":"LOPEZ SAIZ, PABLO","dni":"73571957V","categoria":"CAPATAZ","brifo":"BRIFO-32-A","turno":3,"email":"palopsai@bombersdv.es","pin":"93747"},{"id":173,"nombre":"LORENTE GOMEZ, VICENTE","dni":"73543880T","categoria":"ESPECIALISTA","brifo":"BRIFO-42-B","turno":6,"email":"vilorgom@bombersdv.es","pin":"78685"},{"id":174,"nombre":"LUJAN CARRASCO, CARLOS","dni":"20038336T","categoria":"ESPECIALISTA","brifo":"BRIFO-24-B","turno":8,"email":"calujcar@bombersdv.es","pin":"59932"},{"id":175,"nombre":"LUJAN MARTINEZ, MARIA CARMEN","dni":"52671546M","categoria":"CONDUCTOR","brifo":"BRIFO-14-B","turno":8,"email":"malujmar@bombersdv.es","pin":"97229"},{"id":176,"nombre":"LURBE CARDONA, MIGUEL ANGEL","dni":"20013237V","categoria":"ESPECIALISTA","brifo":"BRIFO-26-A","turno":1,"email":"milurcar@bombersdv.es","pin":"48465"},{"id":177,"nombre":"LUZ ADALID, ESTEFANIA","dni":"18435777N","categoria":"CONDUCTOR","brifo":"BRIFO-52-B","turno":2,"email":"esluzada@bombersdv.es","pin":"16800"},{"id":178,"nombre":"LUZ PASTOR, RAMON","dni":"73548569C","categoria":"ESPECIALISTA","brifo":"BRIFO-52-A","turno":1,"email":"raluzpas@bombersdv.es","pin":"01302"},{"id":179,"nombre":"MADRID GARCIA, MARIA ELENA","dni":"24368343G","categoria":"CONDUCTOR","brifo":"BRIFO-16-B","turno":4,"email":"mamadgar@bombersdv.es","pin":"85390"},{"id":180,"nombre":"MAESTRE BAENA, MIGUEL ANGEL","dni":"33450783C","categoria":"ESPECIALISTA","brifo":"BRIFO-55-A","turno":7,"email":"mimaebae@bombersdv.es","pin":"34579"},{"id":181,"nombre":"MAHIQUES BENAVENT, DOMINGO JOSE","dni":"20016978D","categoria":"ESPECIALISTA","brifo":"BRIFO-27-A","turno":5,"email":"domahben@bombersdv.es","pin":"44634"},{"id":182,"nombre":"MAÑES GABARDA, ANTONIO","dni":"85088947X","categoria":"CAPATAZ","brifo":"BRIFO-55-A","turno":7,"email":"anmangab@bombersdv.es","pin":"57251"},{"id":183,"nombre":"MAÑEZ LAPARRA, JOSE JAVIER","dni":"73773447G","categoria":"CONDUCTOR","brifo":"BRIFO-32-A","turno":3,"email":"jomanlap@bombersdv.es","pin":"31055"},{"id":184,"nombre":"MAÑO MONZO, JESUS","dni":"20017459F","categoria":"CONDUCTOR","brifo":"BRIFO-24-B","turno":8,"email":"jemanmon@bombersdv.es","pin":"11066"},{"id":185,"nombre":"MARRADES MORENO, ADRIAN","dni":"73565771H","categoria":"CONDUCTOR","brifo":"BRIFO-12-B","turno":8,"email":"admarmor@bombersdv.es","pin":"16815"},{"id":186,"nombre":"MARTI PEREZ, SANDRA","dni":"22576330J","categoria":"CONDUCTOR","brifo":"BRIFO-11-B","turno":2,"email":"samarper@bombersdv.es","pin":"05767"},{"id":187,"nombre":"MARTINEZ ALCAIDE, JOSE LUIS","dni":"85088932H","categoria":"CONDUCTOR","brifo":"BRIFO-55-A","turno":7,"email":"jlmaralc@bombersdv.es","pin":"05227"},{"id":188,"nombre":"MARTINEZ ALCANTARILLA, JOSE LUIS","dni":"22694093Q","categoria":"CAPATAZ","brifo":"BRIFO-49-A","turno":3,"email":"jomaralc@bombersdv.es","pin":"64326"},{"id":189,"nombre":"MARTINEZ CARRION, ROSENDO","dni":"24367581R","categoria":"ESPECIALISTA","brifo":"BRIFO-44-B","turno":4,"email":"romarcar@bombersdv.es","pin":"78820"},{"id":190,"nombre":"MARTINEZ CASTELLA, ALBERTO","dni":"20035782E","categoria":"CAPATAZ","brifo":"BRIFO-24-A","turno":7,"email":"almarcas@bombersdv.es","pin":"44428"},{"id":191,"nombre":"MARTINEZ GARCIA, JESUS","dni":"20414194S","categoria":"CONDUCTOR","brifo":"BRIFO-27-A","turno":5,"email":"jemargar@bombersdv.es","pin":"50647"},{"id":192,"nombre":"MARTINEZ HERRERO, JOSE FERNANDO","dni":"25403752E","categoria":"CAPATAZ","brifo":"BRIFO-56-B","turno":8,"email":"jomarher@bombersdv.es","pin":"15321"},{"id":193,"nombre":"MARTINEZ HOYO, FERNANDO","dni":"20450845G","categoria":"ESPECIALISTA","brifo":"BRIFO-27-B","turno":6,"email":"femarhoy@bombersdv.es","pin":"00913"},{"id":194,"nombre":"MARTINEZ MARTINEZ, FERNANDO","dni":"73564917S","categoria":"ESPECIALISTA","brifo":"BRIFO-14-A","turno":7,"email":"femarmar@bombersdv.es","pin":"43910"},{"id":195,"nombre":"MARTINEZ MARTINEZ, JOSE RAMON","dni":"53050148G","categoria":"CONDUCTOR","brifo":"BRIFO-44-B","turno":4,"email":"jomarmar@bombersdv.es","pin":"91980"},{"id":196,"nombre":"MARTINEZ MARTINEZ, JUAN","dni":"52688016F","categoria":"ESPECIALISTA","brifo":"BRIFO-54-A","turno":3,"email":"jumarmar@bombersdv.es","pin":"16392"},{"id":197,"nombre":"MARTINEZ MARTINEZ, NOEL","dni":"53054846X","categoria":"CAPATAZ","brifo":"BRIFO-12-A","turno":7,"email":"nomarmar@bombersdv.es","pin":"59219"},{"id":198,"nombre":"MARTINEZ MARTINEZ, PALOMA","dni":"85088985W","categoria":"CONDUCTOR","brifo":"BRIFO-13-A","turno":5,"email":"pamarmar@bombersdv.es","pin":"37695"},{"id":199,"nombre":"MARTINEZ ORERO, MARIA ISABEL","dni":"73778975N","categoria":"ESPECIALISTA","brifo":"BRIFO-55-B","turno":8,"email":"mamarore@bombersdv.es","pin":"92207"},{"id":200,"nombre":"MARTINEZ PALAU, FRANCISCO DAMIAN","dni":"20417284T","categoria":"CONDUCTOR","brifo":"BRIFO-34-A","turno":3,"email":"framarpal@bombersdv.es","pin":"16306"},{"id":201,"nombre":"MARTINEZ PALOP, SERGIO","dni":"20442188H","categoria":"ESPECIALISTA","brifo":"BRIFO-27-B","turno":6,"email":"semarpal@bombersdv.es","pin":"07260"},{"id":202,"nombre":"MARTINEZ REDONDO, ALBERTO","dni":"52658654Q","categoria":"ESPECIALISTA","brifo":"BRIFO-19-A","turno":5,"email":"semarpal@bombersdv.es","pin":"96038"},{"id":203,"nombre":"MARTINEZ SERRANO, FAUSTO","dni":"22566511S","categoria":"CONDUCTOR","brifo":"BRIFO-35-B","turno":8,"email":"famarser@bombersdv.es","pin":"65085"},{"id":204,"nombre":"MARTINEZ SOTELO, VICENTE","dni":"73582512S","categoria":"CAPATAZ","brifo":"BRIFO-32-B","turno":4,"email":"vimarsot@bombersdv.es","pin":"73988"},{"id":205,"nombre":"MARTINEZ TORTAJADA, EMILIO","dni":"52723151K","categoria":"ESPECIALISTA","brifo":"BRIFO-19-A","turno":5,"email":"emmartor@bombersdv.es","pin":"76837"},{"id":206,"nombre":"MARTINEZ VELASCO, JAIME JOAQUIN","dni":"29194177R","categoria":"ESPECIALISTA","brifo":"BRIFO-12-B","turno":8,"email":"jaimarvel@bombersdv.es","pin":"17070"},{"id":207,"nombre":"MARTINEZ VELASCO, JAVIER","dni":"29194183F","categoria":"CAPATAZ","brifo":"BRIFO-12-B","turno":8,"email":"jamarvel@bombersdv.es","pin":"65196"},{"id":208,"nombre":"MARTINEZ ZAPATA, FERNANDO","dni":"52650950V","categoria":"ESPECIALISTA","brifo":"BRIFO-19-B","turno":6,"email":"femarzap@bombersdv.es","pin":"29607"},{"id":209,"nombre":"MARTORELL FERRER, JUAN","dni":"20817849C","categoria":"ESPECIALISTA","brifo":"BRIFO-21-A","turno":5,"email":"jumarfer@bombersdv.es","pin":"29084"},{"id":210,"nombre":"MARTORELL PALLAS, FRANCISCO JOSE","dni":"20800441T","categoria":"CAPATAZ","brifo":"BRIFO-35-A","turno":7,"email":"frmarpal@bombersdv.es","pin":"06966"},{"id":211,"nombre":"MARTORELL PALLAS, JOAQUIN","dni":"20443497Q","categoria":"CONDUCTOR","brifo":"BRIFO-31-A","turno":1,"email":"jomarpal@bombersdv.es","pin":"92240"},{"id":212,"nombre":"MATAIX LECHUGA, ALEJANDRO","dni":"25424589K","categoria":"ESPECIALISTA","brifo":"BRIFO-17-B","turno":2,"email":"almatlec@bombersdv.es","pin":"54559"},{"id":213,"nombre":"MATTEUCCI DONET, IVAN","dni":"20059999C","categoria":"ESPECIALISTA","brifo":"BRIFO-24-B","turno":8,"email":"ivmatdon@bombersdv.es","pin":"78623"},{"id":214,"nombre":"MELO TORRES, JUAN FRANCISCO","dni":"20438221F","categoria":"ESPECIALISTA","brifo":"BRIFO-35-B","turno":8,"email":"jumeltor@bombersdv.es","pin":"18127"},{"id":215,"nombre":"MIGUEL ANDRES, YOLANDA","dni":"18435897V","categoria":"CONDUCTOR","brifo":"BRIFO-51-B","turno":6,"email":"yomigand@bombersdv.es","pin":"95477"},{"id":216,"nombre":"MIÑANA DONET, DAVID","dni":"20011533S","categoria":"CONDUCTOR","brifo":"BRIFO-24-A","turno":7,"email":"damindon@bombersdv.es","pin":"29353"},{"id":217,"nombre":"MOLINA MARTINEZ, JAIME","dni":"24361881M","categoria":"CAPATAZ","brifo":"BRIFO-54-A","turno":3,"email":"jamolmar@bombersdv.es","pin":"68725"},{"id":218,"nombre":"MOLLA MARTINEZ, GERARDO","dni":"20432615J","categoria":"CAPATAZ","brifo":"BRIFO-34-A","turno":3,"email":"gemolmar@bombersdv.es","pin":"44187"},{"id":219,"nombre":"MOLLA MARTINEZ, JOSE MIGUEL","dni":"20422581F","categoria":"ESPECIALISTA","brifo":"BRIFO-34-A","turno":3,"email":"jomolmar@bombersdv.es","pin":"67080"},{"id":220,"nombre":"MOLLA PEÑA, DAVID","dni":"20442458N","categoria":"ESPECIALISTA","brifo":"BRIFO-39-A","turno":1,"email":"damolpen@bombersdv.es","pin":"49282"},{"id":221,"nombre":"MONAR BARBERA, ANTONIO JOSE","dni":"20425410F","categoria":"CONDUCTOR","brifo":"BRIFO-37-A","turno":5,"email":"anmonbar@bombersdv.es","pin":"48506"},{"id":222,"nombre":"MONCHO GINER, RICARDO JOAQUIN","dni":"24376979S","categoria":"ESPECIALISTA","brifo":"BRIFO-24-B","turno":8,"email":"rimongin@bombersdv.es","pin":"71260"},{"id":223,"nombre":"MONTESINOS LACRUZ, GERMAN","dni":"43416224K","categoria":"CONDUCTOR","brifo":"BRIFO-41-B","turno":8,"email":"gemonlac@bombersdv.es","pin":"07462"},{"id":224,"nombre":"MONTESINOS MONTESINOS, JESUS VICENTE","dni":"73557995Q","categoria":"CAPATAZ","brifo":"BRIFO-53-B","turno":2,"email":"jemonmon@bombersdv.es","pin":"43235"},{"id":225,"nombre":"MONTESINOS MONTESINOS, JUAN CARLOS","dni":"85086407T","categoria":"CAPATAZ","brifo":"BRIFO-41-A","turno":7,"email":"jumonmon@bombersdv.es","pin":"40446"},{"id":226,"nombre":"MORALES GOMEZ, ISABEL","dni":"18424475A","categoria":"ESPECIALISTA","brifo":"BRIFO-52-B","turno":2,"email":"ismorgom@bombersdv.es","pin":"71357"},{"id":227,"nombre":"MORALES GOMEZ, MARINA JESUS","dni":"18422418Q","categoria":"CAPATAZ","brifo":"BRIFO-51-A","turno":5,"email":"mamorgom@bombersdv.es","pin":"34034"},{"id":228,"nombre":"MORCILLO MARTIN, SEBASTIAN","dni":"44791052R","categoria":"ESPECIALISTA","brifo":"BRIFO-42-A","turno":5,"email":"semormar@bombersdv.es","pin":"98355"},{"id":229,"nombre":"MORENO CIGES, JAIME ISIDORO","dni":"20425783N","categoria":"CAPATAZ","brifo":"BRIFO-31-B","turno":2,"email":"jamorcig@bombersdv.es","pin":"45825"},{"id":230,"nombre":"MORENO DEL PRADO, NATALIA","dni":"29171978C","categoria":"CAPATAZ","brifo":"BRIFO-55-B","turno":8,"email":"namordel@bombersdv.es","pin":"49234"},{"id":231,"nombre":"MORENO GARCIA, JUAN VICENTE","dni":"25387349H","categoria":"ESPECIALISTA","brifo":"BRIFO-41-B","turno":8,"email":"jumorgar@bombersdv.es","pin":"16160"},{"id":232,"nombre":"MORENO VILLARROEL, MARIA ANTONIA","dni":"25386216N","categoria":"CAPATAZ","brifo":"BRIFO-36-A","turno":5,"email":"mamorvil@bombersdv.es","pin":"63532"},{"id":233,"nombre":"MUÑOZ FERNANDEZ, ESTANISLAO","dni":"52450264Y","categoria":"CONDUCTOR","brifo":"BRIFO-53-A","turno":1,"email":"esmunfer@bombersdv.es","pin":"88605"},{"id":234,"nombre":"MUÑOZ TRAVES, JUAN VICENTE","dni":"85079170P","categoria":"CONDUCTOR","brifo":"BRIFO-49-A","turno":3,"email":"jumuntra@bombersdv.es","pin":"06400"},{"id":235,"nombre":"MURILLO CORZANA, JOSE LUIS","dni":"73550255G","categoria":"ESPECIALISTA","brifo":"BRIFO-41-A","turno":7,"email":"jomurcor@bombersdv.es","pin":"14778"},{"id":236,"nombre":"NAVARRETE CABANES, JOAQUIN","dni":"73764511S","categoria":"CONDUCTOR","brifo":"BRIFO-55-A","turno":7,"email":"jonavcab@bombersdv.es","pin":"82616"},{"id":237,"nombre":"NAVARRO CASELLES, ENRIQUE","dni":"53096638B","categoria":"ESPECIALISTA","brifo":"BRIFO-15-A","turno":3,"email":"ennavcas@bombersdv.es","pin":"81626"},{"id":238,"nombre":"NAVARRO GARCIA, SERGIO","dni":"53256399Z","categoria":"ESPECIALISTA","brifo":"BRIFO-12-A","turno":7,"email":"senavgar@bombersdv.es","pin":"74837"},{"id":239,"nombre":"NAVARRO GASCON, JORGE","dni":"20417383F","categoria":"CAPATAZ","brifo":"BRIFO-31-A","turno":1,"email":"jonavgas@bombersdv.es","pin":"29530"},{"id":240,"nombre":"NAVARRO NAVARRO, AMPARO","dni":"24330405Q","categoria":"CAPATAZ","brifo":"BRIFO-15-B","turno":4,"email":"amnavnav@bombersdv.es","pin":"67208"},{"id":241,"nombre":"NAVARRO SORIANO, VICENTE","dni":"20445852W","categoria":"ESPECIALISTA","brifo":"BRIFO-28-A","turno":3,"email":"vinavsor@bombersdv.es","pin":"54089"},{"id":242,"nombre":"NUEVALOS NUEVALOS, HUGO","dni":"24366079V","categoria":"COORDINADOR","brifo":"DELTA 41-:::::","turno":1,"email":"hnuevalos@bombersdv.es","pin":"60775"},{"id":243,"nombre":"ORTEGA BARBERA, JOSEFINA","dni":"73567251A","categoria":"ESPECIALISTA","brifo":"BRIFO-41-B","turno":8,"email":"joortbar@bombersdv.es","pin":"82341"},{"id":244,"nombre":"ORTI TERUEL, RAFAEL","dni":"73552435E","categoria":"ESPECIALISTA","brifo":"BRIFO-42-B","turno":6,"email":"raortter@bombersdv.es","pin":"45361"},{"id":245,"nombre":"ORTS RODENAS, JOSE MANUEL","dni":"24333000N","categoria":"ESPECIALISTA","brifo":"BRIFO-36-A","turno":5,"email":"joortrod@bombersdv.es","pin":"18016"},{"id":246,"nombre":"PALACIOS NAVARRO, VICTOR","dni":"73774379Q","categoria":"CAPATAZ","brifo":"BRIFO-24-B","turno":8,"email":"vipalnav@bombersdv.es","pin":"66451"},{"id":247,"nombre":"PARDO CARRASCO, JULIO","dni":"73654623K","categoria":"ESPECIALISTA","brifo":"BRIFO-41-A","turno":7,"email":"juparcar@bombersdv.es","pin":"56544"},{"id":248,"nombre":"PARRA CHOFRE, SALVADOR","dni":"20166987N","categoria":"ESPECIALISTA","brifo":"BRIFO-46-B","turno":4,"email":"saparcho@bombersdv.es","pin":"54209"},{"id":249,"nombre":"PASCUAL ROYO, LUIS","dni":"73760087F","categoria":"CAPATAZ","brifo":"BRIFO-19-B","turno":6,"email":"lupasroy@bombersdv.es","pin":"68685"},{"id":250,"nombre":"PATIÑO OLEAQUE, ANGEL","dni":"73543769G","categoria":"ESPECIALISTA","brifo":"BRIFO-39-A","turno":1,"email":"lupasroy@bombersdv.es","pin":"48122"},{"id":251,"nombre":"PAVIA APARISI, MIGUEL","dni":"20033942E","categoria":"CONDUCTOR","brifo":"BRIFO-26-A","turno":1,"email":"mipavapa@bombersdv.es","pin":"17604"},{"id":252,"nombre":"PAVIA CABALLERO, JOSE","dni":"19987519J","categoria":"COORDINADOR","brifo":"DELTA 21-:::::","turno":6,"email":"jpavia@bombersdv.es","pin":"36653"},{"id":253,"nombre":"PAVO MARQUEZ, ANTONIO","dni":"43419585R","categoria":"ESPECIALISTA","brifo":"BRIFO-51-B","turno":6,"email":"anpavmar@bombersdv.es","pin":"43614"},{"id":254,"nombre":"PAZOS HERVAS, RAQUEL","dni":"33460728Y","categoria":"ESPECIALISTA","brifo":"BRIFO-16-B","turno":4,"email":"rapazher@bombersdv.es","pin":"50293"},{"id":255,"nombre":"PELLETAN TORNERO, NICOLAS","dni":"20161461Y","categoria":"ESPECIALISTA","brifo":"BRIFO-32-B","turno":4,"email":"nipeltor@bombersdv.es","pin":"62484"},{"id":256,"nombre":"PENA RUBIO, SANTIAGO","dni":"48306467G","categoria":"CONDUCTOR","brifo":"BRIFO-46-B","turno":4,"email":"sapenrub@bombersdv.es","pin":"06490"},{"id":257,"nombre":"PEÑALVER LLATAS, DONATO","dni":"25390695Y","categoria":"ESPECIALISTA","brifo":"BRIFO-56-B","turno":8,"email":"dopenlla@bombersdv.es","pin":"12813"},{"id":258,"nombre":"PERAL HERNANDEZ, JUAN CARLOS","dni":"74227647T","categoria":"CAPATAZ","brifo":"BRIFO-42-B","turno":6,"email":"juperher@bombersdv.es","pin":"29979"},{"id":259,"nombre":"PERALES BELLVER, RICARDO","dni":"73543602K","categoria":"CAPATAZ","brifo":"BRIFO-29-B","turno":8,"email":"riperbel@bombersdv.es","pin":"50957"},{"id":260,"nombre":"PEREZ BURRIEL, ANTONIO","dni":"25385243M","categoria":"ESPECIALISTA","brifo":"BRIFO-49-A","turno":3,"email":"anperbur@bombersdv.es","pin":"43005"},{"id":261,"nombre":"PEREZ CATALA, ARTEMIO","dni":"20021733A","categoria":"CAPATAZ","brifo":"BRIFO-23-B","turno":2,"email":"arpercat@bombersdv.es","pin":"03784"},{"id":262,"nombre":"PEREZ MARTINEZ, JOSE FRANCISCO","dni":"85304662P","categoria":"CONDUCTOR","brifo":"BRIFO-35-A","turno":7,"email":"jopermar@bombersdv.es","pin":"14881"},{"id":263,"nombre":"PEREZ MARTINEZ, MIGUEL ANGEL","dni":"85088971B","categoria":"CAPATAZ","brifo":"BRIFO-56-A","turno":7,"email":"mipermar@bombersdv.es","pin":"19763"},{"id":264,"nombre":"PEREZ ROBLES, FRANCISCO","dni":"22690120E","categoria":"ESPECIALISTA","brifo":"BRIFO-13-B","turno":6,"email":"frperrob@bombersdv.es","pin":"41553"},{"id":265,"nombre":"PEREZ SANCHIZ, JUAN JOSE","dni":"85304712N","categoria":"ESPECIALISTA","brifo":"BRIFO-35-A","turno":7,"email":"jupersan@bombersdv.es","pin":"51304"},{"id":266,"nombre":"PEREZ VILLODRES, JUAN","dni":"73565989Y","categoria":"ESPECIALISTA","brifo":"BRIFO-45-B","turno":6,"email":"jupervil@bombersdv.es","pin":"40157"},{"id":267,"nombre":"PIQUER ROMERO, SEBASTIAN","dni":"52729474L","categoria":"ESPECIALISTA","brifo":"BRIFO-17-A","turno":1,"email":"sepiqrom@bombersdv.es","pin":"36683"},{"id":268,"nombre":"PIZARRO MENA, ANTONIO","dni":"20023503W","categoria":"ESPECIALISTA","brifo":"BRIFO-26-B","turno":2,"email":"anpizmen@bombersdv.es","pin":"46520"},{"id":269,"nombre":"PLAZA CILLERO, ENRIQUE","dni":"48535562L","categoria":"CONDUCTOR","brifo":"BRIFO-55-B","turno":8,"email":"enplacil@bombersdv.es","pin":"56558"},{"id":270,"nombre":"PONS RODENAS, JESUS","dni":"20429630H","categoria":"ESPECIALISTA","brifo":"BRIFO-37-A","turno":5,"email":"jeponrod@bombersdv.es","pin":"29536"},{"id":271,"nombre":"PONS VICENT, JOSE LUIS","dni":"20441674X","categoria":"ESPECIALISTA","brifo":"BRIFO-37-B","turno":6,"email":"joponvic@bombersdv.es","pin":"93787"},{"id":272,"nombre":"QUILIS ARBOLES, JOSE MANUEL","dni":"22565651Y","categoria":"CAPATAZ","brifo":"BRIFO-13-A","turno":5,"email":"joquiarb@bombersdv.es","pin":"32211"},{"id":273,"nombre":"RAMIREZ GARCIA, MARIA PILAR","dni":"52653085J","categoria":"CONDUCTOR","brifo":"BRIFO-19-A","turno":5,"email":"maramgar@bombersdv.es","pin":"34221"},{"id":274,"nombre":"RAMIREZ GUZMAN, KEDDY ANTONIO","dni":"X1816725R","categoria":"CAPATAZ","brifo":"BRIFO-47-A","turno":1,"email":"keramguz@bombersdv.es","pin":"44638"},{"id":275,"nombre":"REBOIRO ESTEVEZ, PABLO","dni":"36167169Z","categoria":"ESPECIALISTA","brifo":"BRIFO-54-B","turno":4,"email":"parebest@bombersdv.es","pin":"63724"},{"id":276,"nombre":"REILLO PEREZ, MARIA MONSERRAT","dni":"25406078W","categoria":"ESPECIALISTA","brifo":"BRIFO-19-A","turno":5,"email":"mareiper@bombersdv.es","pin":"12160"},{"id":277,"nombre":"REQUENA BERMELL, PASCUAL","dni":"44882492Q","categoria":"CONDUCTOR","brifo":"BRIFO-38-B","turno":8,"email":"pareqber@bombersdv.es","pin":"32089"},{"id":278,"nombre":"REYES CANTERO, FRANCISCO","dni":"52648834V","categoria":"ESPECIALISTA","brifo":"BRIFO-13-B","turno":6,"email":"frreycan@bombersdv.es","pin":"15287"},{"id":279,"nombre":"RIBELLES GARCIA, JORGE","dni":"73542937T","categoria":"CONDUCTOR","brifo":"BRIFO-31-B","turno":2,"email":"joribgar@bombersdv.es","pin":"12124"},{"id":280,"nombre":"RICART REIG, JOSE","dni":"20417159J","categoria":"ESPECIALISTA","brifo":"BRIFO-39-B","turno":2,"email":"joricrei@bombersdv.es","pin":"77710"},{"id":281,"nombre":"RICARTE TORRALBA, RODRIGO","dni":"53723317D","categoria":"ESPECIALISTA","brifo":"BRIFO-44-B","turno":4,"email":"rorictor@bombersdv.es","pin":"59278"},{"id":282,"nombre":"RIDAURA ALVENTOSA, CESAR","dni":"20420739M","categoria":"COORDINADOR","brifo":"DELTA 42-:::::","turno":4,"email":"cridaura@bombersdv.es","pin":"05141"},{"id":283,"nombre":"ROBLEDO HUERTA, JOSE LUIS","dni":"52707167E","categoria":"CONDUCTOR","brifo":"BRIFO-33-A","turno":5,"email":"jorobhue@bombersdv.es","pin":"56839"},{"id":284,"nombre":"ROBLES POVO, JAVIER","dni":"20153191Q","categoria":"CAPATAZ","brifo":"BRIFO-57-A","turno":3,"email":"jarobpov@bombersdv.es","pin":"24517"},{"id":285,"nombre":"ROBLES SABATER, PILAR","dni":"73575008D","categoria":"CONDUCTOR","brifo":"BRIFO-13-B","turno":6,"email":"pirobsab@bombersdv.es","pin":"42037"},{"id":286,"nombre":"ROCH BOIGUES, JOSE MIGUEL","dni":"73763444Y","categoria":"CONDUCTOR","brifo":"BRIFO-19-B","turno":6,"email":"jorocboi@bombersdv.es","pin":"97185"},{"id":287,"nombre":"RODENAS CARRETERO, ANGEL","dni":"73655131T","categoria":"CAPATAZ","brifo":"BRIFO-43-B","turno":2,"email":"anrodcar@bombersdv.es","pin":"35038"},{"id":288,"nombre":"RODRIGO PUCHALT, JUAN JOSE","dni":"20164946H","categoria":"ESPECIALISTA","brifo":"BRIFO-42-A","turno":5,"email":"jurodpuc@bombersdv.es","pin":"06619"},{"id":289,"nombre":"RODRIGUEZ CAMPOS, ENRIQUE","dni":"25395240C","categoria":"ESPECIALISTA","brifo":"BRIFO-16-B","turno":4,"email":"enrodcam@bombersdv.es","pin":"37948"},{"id":290,"nombre":"RODRIGUEZ COLOMER, JAVIER","dni":"22563139R","categoria":"ESPECIALISTA","brifo":"BRIFO-25-B","turno":8,"email":"jarodcol@bombersdv.es","pin":"19762"},{"id":291,"nombre":"RODRIGUEZ LOPEZ, JAVIER","dni":"53059819S","categoria":"ESPECIALISTA","brifo":"BRIFO-16-B","turno":4,"email":"jarodlop@bombersdv.es","pin":"63575"},{"id":292,"nombre":"RODRIGUEZ MOLERO, VICTOR","dni":"73503569P","categoria":"COORDINADOR","brifo":"DELTA 52-:::::","turno":8,"email":"vrodriguez@bombersdv.es","pin":"60948"},{"id":293,"nombre":"ROMERO GARCIA, ARCADIO","dni":"20158726P","categoria":"CAPATAZ","brifo":"BRIFO-44-A","turno":3,"email":"arromgar@bombersdv.es","pin":"08163"},{"id":294,"nombre":"ROMERO ROGER, IVAN","dni":"48439646J","categoria":"CONDUCTOR","brifo":"BRIFO-12-A","turno":7,"email":"ivromrog@bombersdv.es","pin":"72709"},{"id":295,"nombre":"ROMERO ROMERO, MIGUEL ANGEL","dni":"73380336D","categoria":"CAPATAZ","brifo":"BRIFO-17-A","turno":1,"email":"miromrom@bombersdv.es","pin":"23754"},{"id":296,"nombre":"RUBIO POLO, VICTORIO","dni":"20792860D","categoria":"CAPATAZ","brifo":"BRIFO-23-A","turno":1,"email":"virubpol@bombersdv.es","pin":"07529"},{"id":297,"nombre":"SAEZ CALATAYUD, JOSE AGUSTIN","dni":"20418268H","categoria":"ESPECIALISTA","brifo":"BRIFO-34-A","turno":3,"email":"josaecal@bombersdv.es","pin":"12187"},{"id":298,"nombre":"SAEZ FERNANDEZ, MIGUEL","dni":"25391959M","categoria":"ESPECIALISTA","brifo":"BRIFO-18-A","turno":5,"email":"misaefer@bombersdv.es","pin":"71835"},{"id":299,"nombre":"SAEZ SAEZ, JOSE MANUEL","dni":"29169210N","categoria":"ESPECIALISTA","brifo":"BRIFO-33-A","turno":5,"email":"josaesae@bombersdv.es","pin":"00960"},{"id":300,"nombre":"SAEZ SANCHO, JOSE LUIS","dni":"20422293H","categoria":"ESPECIALISTA","brifo":"BRIFO-22-A","turno":3,"email":"josaesan@bombersdv.es","pin":"39636"},{"id":301,"nombre":"SAEZ VARELA, JUAN","dni":"20429583V","categoria":"ESPECIALISTA","brifo":"BRIFO-35-A","turno":7,"email":"jusaevar@bombersdv.es","pin":"41948"},{"id":302,"nombre":"SAHUQUILLO VALENCIANO, MIGUEL","dni":"52658455R","categoria":"CAPATAZ","brifo":"BRIFO-43-B","turno":2,"email":"misahval@bombersdv.es","pin":"80039"},{"id":303,"nombre":"SALAZAR MARTINEZ, JOSE MARIA","dni":"20437818H","categoria":"CAPATAZ","brifo":"BRIFO-36-B","turno":6,"email":"josalmar@bombersdv.es","pin":"97550"},{"id":304,"nombre":"SANCHEZ ANAYA, VICENTE","dni":"73557648Z","categoria":"ESPECIALISTA","brifo":"BRIFO-36-A","turno":5,"email":"visanana@bombersdv.es","pin":"20248"},{"id":305,"nombre":"SANCHEZ ANTON, YOLANDA","dni":"18430816L","categoria":"ESPECIALISTA","brifo":"BRIFO-52-B","turno":2,"email":"yosanant@bombersdv.es","pin":"05055"},{"id":306,"nombre":"SANCHEZ AROCAS, MARIA CRUZ","dni":"44862957P","categoria":"ESPECIALISTA","brifo":"BRIFO-33-A","turno":5,"email":"masanaro@bombersdv.es","pin":"74705"},{"id":307,"nombre":"SANCHEZ JUAN, JOSE","dni":"48286792V","categoria":"CAPATAZ","brifo":"BRIFO-22-A","turno":3,"email":"josanjua@bombersdv.es","pin":"68737"},{"id":308,"nombre":"SANCHEZ ROS, ELIAS MIGUEL","dni":"44506520W","categoria":"CONDUCTOR","brifo":"BRIFO-16-A","turno":3,"email":"elsanros@bombersdv.es","pin":"59023"},{"id":309,"nombre":"SANCHEZ SANCHEZ, HECTOR","dni":"44799562R","categoria":"CAPATAZ","brifo":"BRIFO-14-B","turno":8,"email":"hesansan@bombersdv.es","pin":"27670"},{"id":310,"nombre":"SANCHEZ SEOANE, JESUS MIGUEL","dni":"24337546G","categoria":"COORDINADOR","brifo":"DELTA 32-:::::","turno":6,"email":"jesanseo@bombersdv.es","pin":"56567"},{"id":311,"nombre":"SANCHIS VILA, MOISES","dni":"20444520G","categoria":"ESPECIALISTA","brifo":"BRIFO-11-B","turno":2,"email":"mosanvil@bombersdv.es","pin":"37299"},{"id":312,"nombre":"SANZ TELLO, RAFAEL","dni":"79091060V","categoria":"CONDUCTOR","brifo":"BRIFO-17-A","turno":1,"email":"rasantel@bombersdv.es","pin":"08445"},{"id":313,"nombre":"SAPIÑA CALVO, JAIME","dni":"29207779X","categoria":"ESPECIALISTA","brifo":"BRIFO-14-B","turno":8,"email":"jasapcal@bombersdv.es","pin":"93015"},{"id":314,"nombre":"SERRA ORTIZ, DARIO","dni":"48587314K","categoria":"ESPECIALISTA","brifo":"BRIFO-32-B","turno":4,"email":"daserort@bombersdv.es","pin":"39754"},{"id":315,"nombre":"SERRANO GANDIA, VICENTE","dni":"20425503P","categoria":"CAPATAZ","brifo":"BRIFO-35-B","turno":8,"email":"visergan@bombersdv.es","pin":"48563"},{"id":316,"nombre":"SERRANO SALES, EZEQUIEL","dni":"29166290J","categoria":"ESPECIALISTA","brifo":"BRIFO-31-B","turno":2,"email":"ezsersal@bombersdv.es","pin":"19884"},{"id":317,"nombre":"SIGNES MOMPÓ, VICENTE JOSÉ","dni":"20420343T","categoria":"ESPECIALISTA","brifo":"BRIFO-39-B","turno":2,"email":"visigmom@bombersdv.es","pin":"00078"},{"id":318,"nombre":"SIMO GINER, CAROLINA","dni":"20428291J","categoria":"CONDUCTOR","brifo":"BRIFO-27-B","turno":6,"email":"casimgin@bombersdv.es","pin":"02726"},{"id":319,"nombre":"SISTERNES GARRIDO, JOSE ANTONIO","dni":"20414196V","categoria":"CAPATAZ","brifo":"BRIFO-21-A","turno":5,"email":"josisgar@bombersdv.es","pin":"91599"},{"id":320,"nombre":"SOLER SANZ, JOSE MARIA","dni":"29162893C","categoria":"ESPECIALISTA","brifo":"BRIFO-31-A","turno":1,"email":"josolsan@bombersdv.es","pin":"25887"},{"id":321,"nombre":"SORO SENTANDREU, FEDERICO","dni":"20802588P","categoria":"CONDUCTOR","brifo":"BRIFO-21-A","turno":5,"email":"fesorsen@bombersdv.es","pin":"26908"},{"id":322,"nombre":"TENA CASTELLOTE, MIGUEL ANGEL","dni":"22565288B","categoria":"ESPECIALISTA","brifo":"BRIFO-44-A","turno":3,"email":"mitencas@bombersdv.es","pin":"55012"},{"id":323,"nombre":"TEROL CASANOVA, JULIO","dni":"19094244N","categoria":"CAPATAZ","brifo":"BRIFO-22-B","turno":4,"email":"jutercas@bombersdv.es","pin":"92142"},{"id":324,"nombre":"TORRES SANCHIS, JOSE ARMANDO","dni":"20432025K","categoria":"CONDUCTOR","brifo":"BRIFO-38-A","turno":7,"email":"jotorsan@bombersdv.es","pin":"01385"},{"id":325,"nombre":"TORTAJADA PIQUERAS, YOLANDA","dni":"43430283G","categoria":"CONDUCTOR","brifo":"BRIFO-57-A","turno":3,"email":"yotorpiq@bombersdv.es","pin":"06748"},{"id":326,"nombre":"VALENTIN MORENO, FRANCISCO","dni":"18426173E","categoria":"ESPECIALISTA","brifo":"BRIFO-52-B","turno":2,"email":"frvalmor@bombersdv.es","pin":"92266"},{"id":327,"nombre":"VANACLOIG FABUEL, SALVADOR","dni":"24330039H","categoria":"ESPECIALISTA","brifo":"BRIFO-54-B","turno":4,"email":"savanfab@bombersdv.es","pin":"57968"},{"id":328,"nombre":"VANACLOIG FABUEL, SERGIO","dni":"24352588G","categoria":"CONDUCTOR","brifo":"BRIFO-54-A","turno":3,"email":"sevanfab@bombersdv.es","pin":"10054"},{"id":329,"nombre":"VARGAS GUAITA, DIEGO","dni":"73778298W","categoria":"CAPATAZ","brifo":"BRIFO-43-A","turno":1,"email":"divargua@bombersdv.es","pin":"47628"},{"id":330,"nombre":"VERZOSA GONZALVEZ, LUIS","dni":"19992332L","categoria":"CAPATAZ","brifo":"BRIFO-26-B","turno":2,"email":"luvergon@bombersdv.es","pin":"07980"},{"id":331,"nombre":"VICENTE BLASCO, JESUS","dni":"18418738Q","categoria":"CONDUCTOR","brifo":"BRIFO-52-A","turno":1,"email":"jevicbla@bombersdv.es","pin":"78501"},{"id":332,"nombre":"VIDAL SANZ, DANIEL","dni":"48291081M","categoria":"ESPECIALISTA","brifo":"BRIFO-22-A","turno":3,"email":"davidsan@bombersdv.es","pin":"70533"},{"id":333,"nombre":"VIETA ROMERO, JAVIER","dni":"73563432W","categoria":"CONDUCTOR","brifo":"BRIFO-43-A","turno":1,"email":"javierom@bombersdv.es","pin":"18889"},{"id":334,"nombre":"VILLA GARCIA, VICENTE OSCAR","dni":"20433060K","categoria":"COORDINADOR","brifo":"DELTA 22-:::::","turno":2,"email":"ovilla@bombersdv.es","pin":"76946"},{"id":335,"nombre":"VILLAESCUSA BADENAS, PEDRO","dni":"73577301W","categoria":"ESPECIALISTA","brifo":"BRIFO-16-A","turno":3,"email":"pevilbad@bombersdv.es","pin":"26065"},{"id":336,"nombre":"VILLANUEVA GOMEZ, FRANCISCO","dni":"20410575F","categoria":"CONDUCTOR","brifo":"BRIFO-25-A","turno":7,"email":"frvilgom@bombersdv.es","pin":"50507"},{"id":337,"nombre":"ZAHONERO ABRIL, VICENTE","dni":"25407023G","categoria":"CAPATAZ","brifo":"BRIFO-46-B","turno":4,"email":"vizahabr@bombersdv.es","pin":"55523"},{"id":338,"nombre":"ZARAGOZA I ARNAEZ, VICTOR","dni":"48582905M","categoria":"ESPECIALISTA","brifo":"BRIFO-23-B","turno":2,"email":"vizahabr@bombersdv.es","pin":"86465"},{"id":339,"nombre":"ZARZO GENOVES, JAIME","dni":"52749723M","categoria":"ESPECIALISTA","brifo":"BRIFO-47-A","turno":1,"email":"jazargen@bombersdv.es","pin":"19085"},{"id":340,"nombre":"ZOMEÑO ABARCA, AQUILINO","dni":"20427264K","categoria":"CONDUCTOR","brifo":"BRIFO-36-A","turno":5,"email":"aqzomaba@bombersdv.es","pin":"94329"},{"id":341,"nombre":"ZURRIAGA BERGA, RAUL","dni":"22699763M","categoria":"ESPECIALISTA","brifo":"BRIFO-17-B","turno":2,"email":"razurber@bombersdv.es","pin":"21167"}];
+const CALENDAR_2026 = {"1":[0,0,2,2,2,0,0,2,2,0,0,0,2,2,0,0,2,2,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0],"2":[2,2,0,0,0,2,2,0,0,2,2,2,0,0,2,2,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1],"3":[0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,2,2,0,0,2,2,2,0,0,2,2,0,0,0,2,2,0],"4":[1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,2,0,0,2,2,0,0,0,2,2,0,0,2,2,2,0,0,2],"5":[0,2,2,2,0,0,2,2,0,0,0,2,2,0,0,2,2,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0],"6":[2,0,0,0,2,2,0,0,2,2,2,0,0,2,2,0,0,0,2,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1],"7":[0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,2,2,0,0,2,2,2,0,0,2,2,0,0,0,2,2,0,0],"8":[1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,0,1,1,0,0,1,1,1,0,0,2,2,0,0,0,2,2,0,0,2,2,2,0,0,2,2]};
+</script>
+<script type="text/babel" id="appScript">
+
+// ─── CALENDAR HELPERS ───────────────────────────────────────────────────────
+function getDayIndex(dateStr) {
+  // dateStr: "YYYY-MM-DD"
+  const d = new Date(dateStr + 'T00:00:00');
+  const start = new Date('2026-01-01T00:00:00');
+  return Math.round((d - start) / 86400000);
+}
+
+function getTurnStatus(turno, dateStr) {
+  // Returns: 0=libre, 1=trabaja, 2=vacaciones
+  const idx = getDayIndex(dateStr);
+  if (idx < 0 || idx > 364) return 0;
+  const key = String(turno);
+  if (!CALENDAR_2026[key]) return 0;
+  return CALENDAR_2026[key][idx];
+}
+
+function worksOnDay(turno, dateStr) {
+  return getTurnStatus(turno, dateStr) === 1;
+}
+
+function check12hRule(turno, guardiaDateStr, guardiaStartHour, guardiaDurationHours) {
+  // Turno works 08:00-18:00
+  // Returns { ok: bool, reason: string }
+  const dayBefore = new Date(guardiaDateStr + 'T00:00:00');
+  dayBefore.setDate(dayBefore.getDate() - 1);
+  const dayBeforeStr = dayBefore.toISOString().split('T')[0];
+
+  const dayAfter = new Date(guardiaDateStr + 'T00:00:00');
+  dayAfter.setDate(dayAfter.getDate() + 1);
+  const dayAfterStr = dayAfter.toISOString().split('T')[0];
+
+  const guardiaStart = new Date(`${guardiaDateStr}T${String(guardiaStartHour).padStart(2,'0')}:00:00`);
+  const guardiaEnd = new Date(guardiaStart.getTime() + guardiaDurationHours * 3600000);
+
+  // Check day before: if they work 08:00-18:00, need 12h rest before guardia
+  if (worksOnDay(turno, dayBeforeStr)) {
+    const prevEnd = new Date(`${dayBeforeStr}T18:00:00`);
+    const restBefore = (guardiaStart - prevEnd) / 3600000;
+    if (restBefore < 12) {
+      return { ok: false, type: 'before', hoursShort: (12 - restBefore).toFixed(1) };
+    }
+  }
+
+  // Check day after: if they work 08:00-18:00, need 12h rest after guardia
+  if (worksOnDay(turno, dayAfterStr)) {
+    const nextStart = new Date(`${dayAfterStr}T08:00:00`);
+    const restAfter = (nextStart - guardiaEnd) / 3600000;
+    if (restAfter < 12) {
+      return { ok: false, type: 'after', hoursShort: (12 - restAfter).toFixed(1) };
+    }
+  }
+
+  return { ok: true };
+}
+
+// ─── DNI NORMALIZER ─────────────────────────────────────────────────────────
+function normalizeDNI(raw) {
+  return raw.replace(/[.\-,\s]/g, '').toUpperCase();
+}
+
+function isValidDNIFormat(dni) {
+  return /^\d{8}[A-Z]$/.test(dni);
+}
+
+// ─── GOOGLE APPS SCRIPT BACKEND ─────────────────────────────────────────────
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzIKxSygKrxONxxgUj4LUHhkJFIH82QaCwW3hZurED_x9SpFPIFkN95HPyxNEqj4MxI/exec";
+
+async function gasGet(action) {
+  try {
+    const res = await fetch(GAS_URL + '?action=' + action);
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+async function gasPost(body) {
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(body)
+    });
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+// ─── I18N ───────────────────────────────────────────────────────────────────
+const T = {
+  es: {
+    title: 'Guardias Extraordinarias',
+    subtitle: 'BOMBERS DE LA DIPUTACIÓ DE VALÈNCIA',
+    identify: 'Identificación',
+    yourDni: 'Tu DNI',
+    yourPin: 'Tu PIN',
+    dniPlaceholder: '12345678A',
+    pinPlaceholder: '·····',
+    verify: 'VERIFICAR IDENTIDAD',
+    activeGuardia: 'GUARDIA ACTIVA',
+    closedGuardia: 'PLAZO CERRADO',
+    noGuardia: 'Sin guardia activa',
+    noGuardiaDesc: 'En este momento no hay ninguna guardia extraordinaria publicada.',
+    deadline: 'Plazo de respuesta',
+    timeLeft: 'Tiempo restante',
+    date: 'Fecha',
+    start: 'Inicio',
+    duration: 'Duración',
+    hours: 'horas',
+    needed: 'Plazas',
+    requesters: 'Solicitantes',
+    yourStatus: 'Tu situación',
+    eligible: '✓ Eres elegible para esta guardia',
+    notEligible: 'No puedes solicitar esta guardia',
+    worksDay: 'Trabajas en turno ordinario ese día',
+    vacDay: 'Estás de vacaciones ese día',
+    rest12before: 'No cumples las 12h de descanso tras tu turno anterior',
+    rest12after: 'No cumples las 12h de descanso antes de tu próximo turno',
+    alreadyApplied: 'Ya has solicitado esta guardia',
+    closed: 'El plazo de solicitud ha cerrado',
+    maxReached: 'Se ha alcanzado el número máximo de voluntarios',
+    priority: 'Tu posición en el orden de prioridad',
+    accHours: 'Horas acumuladas',
+    sendRequest: 'SOLICITAR GUARDIA',
+    sending: 'ABRIENDO CORREO...',
+    emailNote: 'Se abrirá tu cliente de correo para enviar la solicitud.',
+    adminPanel: 'Panel de Administración',
+    adminPass: 'Contraseña de administrador',
+    adminLogin: 'ACCEDER',
+    adminLogout: 'Cerrar sesión',
+    publish: 'Publicar nueva guardia',
+    publishBtn: 'PUBLICAR GUARDIA',
+    updateBtn: 'ACTUALIZAR GUARDIA',
+    description: 'Descripción / Emergencia',
+    dateField: 'Fecha de la guardia',
+    startHour: 'Hora de inicio (h)',
+    durationH: 'Duración (h)',
+    deadlineDate: 'Fecha límite respuesta',
+    deadlineHour: 'Hora límite (HH:MM)',
+    maxPeople: 'Máx. voluntarios',
+    applicants: 'Voluntarios apuntados',
+    exportExcel: 'Exportar CSV',
+    noApplicants: 'Nadie se ha apuntado aún',
+    rank: 'Pos.',
+    name: 'Nombre',
+    dni: 'DNI',
+    turn: 'Turno',
+    category: 'Categoría',
+    brifo: 'Brigada',
+    appliedAt: 'Solicitado',
+    late: 'Fuera de plazo',
+    history: 'Histórico de horas',
+    myHours: 'Mis horas acumuladas',
+    totalHours: 'Total horas',
+    noHistory: 'Sin historial de guardias.',
+    invalidDni: 'DNI no válido. Formato: 8 números + letra',
+    dniNotFound: 'DNI no encontrado en el sistema',
+    wrongPin: 'PIN incorrecto',
+    urgentSoon: '⚠ Cierra pronto',
+    tabs_status: 'Estado',
+    tabs_applicants: 'Voluntarios',
+    tabs_history: 'Histórico',
+    tabs_publish: 'Publicar',
+    closed_info: 'El plazo de solicitud ha finalizado.',
+    hoursUnit: 'h acumuladas',
+  },
+  va: {
+    title: 'Guàrdies Extraordinàries',
+    subtitle: 'BOMBERS DE LA DIPUTACIÓ DE VALÈNCIA',
+    identify: 'Identificació',
+    yourDni: 'El teu DNI',
+    yourPin: 'El teu PIN',
+    dniPlaceholder: '12345678A',
+    pinPlaceholder: '·····',
+    verify: 'VERIFICAR IDENTITAT',
+    activeGuardia: 'GUÀRDIA ACTIVA',
+    closedGuardia: 'TERMINI TANCAT',
+    noGuardia: 'Sense guàrdia activa',
+    noGuardiaDesc: 'En aquest moment no hi ha cap guàrdia extraordinària publicada.',
+    deadline: 'Termini de resposta',
+    timeLeft: 'Temps restant',
+    date: 'Data',
+    start: 'Inici',
+    duration: 'Durada',
+    hours: 'hores',
+    needed: 'Places',
+    requesters: 'Sol·licitants',
+    yourStatus: 'La teua situació',
+    eligible: '✓ Ets elegible per a aquesta guàrdia',
+    notEligible: 'No pots sol·licitar aquesta guàrdia',
+    worksDay: 'Treballes en torn ordinari eixe dia',
+    vacDay: 'Estàs de vacances eixe dia',
+    rest12before: 'No complixes les 12h de descans després del teu torn anterior',
+    rest12after: 'No complixes les 12h de descans abans del teu pròxim torn',
+    alreadyApplied: 'Ja has sol·licitat aquesta guàrdia',
+    closed: 'El termini de sol·licitud ha tancat',
+    maxReached: 'S\'ha assolit el nombre màxim de voluntaris',
+    priority: 'La teua posició en l\'ordre de prioritat',
+    accHours: 'Hores acumulades',
+    sendRequest: 'SOL·LICITAR GUÀRDIA',
+    sending: 'OBRINT CORREU...',
+    emailNote: 'S\'obrirà el teu client de correu per enviar la sol·licitud.',
+    adminPanel: 'Panell d\'Administració',
+    adminPass: 'Contrasenya d\'administrador',
+    adminLogin: 'ACCEDIR',
+    adminLogout: 'Tancar sessió',
+    publish: 'Publicar nova guàrdia',
+    publishBtn: 'PUBLICAR GUÀRDIA',
+    updateBtn: 'ACTUALITZAR GUÀRDIA',
+    description: 'Descripció / Emergència',
+    dateField: 'Data de la guàrdia',
+    startHour: 'Hora d\'inici (h)',
+    durationH: 'Durada (h)',
+    deadlineDate: 'Data límit resposta',
+    deadlineHour: 'Hora límit (HH:MM)',
+    maxPeople: 'Màx. voluntaris',
+    applicants: 'Voluntaris apuntats',
+    exportExcel: 'Exportar CSV',
+    noApplicants: 'Ningú s\'ha apuntat encara',
+    rank: 'Pos.',
+    name: 'Nom',
+    dni: 'DNI',
+    turn: 'Torn',
+    category: 'Categoria',
+    brifo: 'Brigada',
+    appliedAt: 'Sol·licitat',
+    late: 'Fora de termini',
+    history: 'Historial d\'hores',
+    myHours: 'Les meues hores acumulades',
+    totalHours: 'Total hores',
+    noHistory: 'Sense historial de guàrdies.',
+    invalidDni: 'DNI no vàlid. Format: 8 números + lletra',
+    dniNotFound: 'DNI no trobat al sistema',
+    wrongPin: 'PIN incorrecte',
+    urgentSoon: '⚠ Tanca prompte',
+    tabs_status: 'Estat',
+    tabs_applicants: 'Voluntaris',
+    tabs_history: 'Historial',
+    tabs_publish: 'Publicar',
+    closed_info: 'El termini de sol·licitud ha finalitzat.',
+    hoursUnit: 'h acumulades',
+  }
+};
+
+// ─── COUNTDOWN ──────────────────────────────────────────────────────────────
+function useCountdown(deadlineISO) {
+  const [diff, setDiff] = useState(null);
+  useEffect(() => {
+    if (!deadlineISO) return;
+    const update = () => {
+      const now = new Date();
+      const end = new Date(deadlineISO);
+      const ms = end - now;
+      setDiff(ms);
+    };
+    update();
+    const t = setInterval(update, 1000);
+    return () => clearInterval(t);
+  }, [deadlineISO]);
+  return diff;
+}
+
+function formatCountdown(ms) {
+  if (ms <= 0) return { text: '00:00:00', cls: 'urgent' };
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  const text = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const cls = ms < 3600000 ? 'urgent' : ms < 86400000 ? 'warning' : 'ok';
+  return { text, cls };
+}
+
+// ─── ADMIN PASSWORD ──────────────────────────────────────────────────────────
+const ADMIN_PASS = 'brifo2026';
+
+// ─── MAIN APP ────────────────────────────────────────────────────────────────
+function App() {
+  const [lang, setLang] = useState('es');
+  const t = T[lang];
+
+  // Auth state
+  const [user, setUser] = useState(null); // logged-in person
+  const [dniInput, setDniInput] = useState('');
+  const [pinInput, setPinInput] = useState('');
+  const [authError, setAuthError] = useState('');
+
+  // Admin state
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [adminPassInput, setAdminPassInput] = useState('');
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+  const [adminPassError, setAdminPassError] = useState('');
+  const [adminTab, setAdminTab] = useState('applicants');
+
+  // Guardia data (synced with Google Sheets via GAS)
+  const [guardia, setGuardia] = useState(null);
+  const [solicitudes, setSolicitudes] = useState([]);
+  const [horasAcc, setHorasAcc] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [syncError, setSyncError] = useState(false);
+
+  // Admin form
+  const [adminForm, setAdminForm] = useState({
+    descripcion: '', fecha: '', horaInicio: '8', duracion: '10',
+    deadlineDate: '', deadlineHour: '20:00', maxPersonas: '10'
+  });
+
+  // ── LOAD DATA FROM GAS ──
+  useEffect(() => {
+    loadAllData();
+    const interval = setInterval(loadAllData, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  async function loadAllData() {
+    setSyncError(false);
+    try {
+      const [gRes, sRes, hRes] = await Promise.all([
+        gasGet('getGuardia'),
+        gasGet('getSolicitudes'),
+        gasGet('getHoras')
+      ]);
+      if (gRes) setGuardia(gRes.guardia);
+      if (sRes) setSolicitudes(sRes.solicitudes || []);
+      if (hRes) setHorasAcc(hRes.horas || {});
+    } catch(e) {
+      setSyncError(true);
+    }
+    setLoading(false);
+  }
+
+  // Countdown
+  const deadlineISO = guardia ? `${guardia.deadlineDate}T${guardia.deadlineHour}:00` : null;
+  const countdown = useCountdown(deadlineISO);
+  const isOpen = guardia && countdown !== null && countdown > 0;
+  const maxReached = guardia && solicitudes.filter(s => !s.late).length >= parseInt(guardia.maxPersonas || 999);
+
+  // ── AUTH ──
+  function handleLogin() {
+    setAuthError('');
+    const dni = normalizeDNI(dniInput);
+    if (!isValidDNIFormat(dni)) { setAuthError(t.invalidDni); return; }
+    const person = PERSONAL_DATA.find(p => normalizeDNI(p.dni) === dni);
+    if (!person) { setAuthError(t.dniNotFound); return; }
+    if (String(person.pin).padStart(5,'0') !== String(pinInput).padStart(5,'0')) {
+      setAuthError(t.wrongPin); return;
+    }
+    setUser(person);
+  }
+
+  // ── ELIGIBILITY ──
+  function getEligibility() {
+    if (!user || !guardia) return null;
+    const turno = user.turno;
+    const fecha = guardia.fecha;
+    const status = getTurnStatus(turno, fecha);
+
+    if (status === 1) return { ok: false, reason: t.worksDay };
+    if (status === 2) return { ok: false, reason: t.vacDay };
+
+    const rest = check12hRule(turno, fecha, parseInt(guardia.horaInicio), parseFloat(guardia.duracion));
+    if (!rest.ok) {
+      return { ok: false, reason: rest.type === 'before' ? t.rest12before : t.rest12after };
+    }
+
+    if (!isOpen) return { ok: false, reason: t.closed };
+    if (maxReached) return { ok: false, reason: t.maxReached };
+
+    const alreadyApplied = solicitudes.some(s => normalizeDNI(s.dni) === normalizeDNI(user.dni));
+    if (alreadyApplied) return { ok: false, reason: t.alreadyApplied };
+
+    return { ok: true };
+  }
+
+  // ── PRIORITY ──
+  function getPriority() {
+    if (!user || !guardia) return null;
+    // Get all eligible people sorted by hours
+    const eligible = PERSONAL_DATA.filter(p => {
+      const status = getTurnStatus(p.turno, guardia.fecha);
+      if (status !== 0) return false;
+      const rest = check12hRule(p.turno, guardia.fecha, parseInt(guardia.horaInicio), parseFloat(guardia.duracion));
+      return rest.ok;
+    }).map(p => ({
+      ...p,
+      hours: horasAcc[normalizeDNI(p.dni)] || 0
+    })).sort((a, b) => a.hours - b.hours);
+
+    const myIdx = eligible.findIndex(p => normalizeDNI(p.dni) === normalizeDNI(user.dni));
+    return { rank: myIdx + 1, total: eligible.length };
+  }
+
+  // ── SEND REQUEST ──
+  function handleSendRequest() {
+    if (!user || !guardia) return;
+    const isLate = !isOpen;
+    const newSol = {
+      id: Date.now(),
+      nombre: user.nombre,
+      dni: user.dni,
+      turno: user.turno,
+      categoria: user.categoria,
+      brifo: user.brifo,
+      email: user.email,
+      horasAcc: horasAcc[normalizeDNI(user.dni)] || 0,
+      appliedAt: new Date().toISOString(),
+      late: isLate
+    };
+    setSolicitudes(prev => [...prev, newSol]);
+    gasPost({ action: 'addSolicitud', solicitud: newSol });
+
+    // Build mailto
+    const subject = encodeURIComponent(`Solicitud Guardia Extraordinaria – ${guardia.fecha} – ${user.nombre}`);
+    const body = encodeURIComponent(
+      `Solicitud de Guardia Extraordinaria\n` +
+      `================================\n` +
+      `Guardia: ${guardia.descripcion}\n` +
+      `Fecha: ${guardia.fecha}\n` +
+      `Hora inicio: ${guardia.horaInicio}:00h\n` +
+      `Duración: ${guardia.duracion} horas\n\n` +
+      `DATOS DEL SOLICITANTE\n` +
+      `Nombre: ${user.nombre}\n` +
+      `DNI: ${user.dni}\n` +
+      `Turno: ${user.turno}\n` +
+      `Categoría: ${user.categoria}\n` +
+      `Email: ${user.email}\n` +
+      `Horas acumuladas: ${horasAcc[normalizeDNI(user.dni)] || 0}h\n\n` +
+      (isLate ? `⚠ SOLICITUD FUERA DE PLAZO – enviada el ${new Date().toLocaleString('es-ES')}\n` : '')
+    );
+    window.location.href = `mailto:guardiasextra@bombersdv.es?subject=${subject}&body=${body}`;
+  }
+
+  // ── ADMIN PUBLISH ──
+  async function handlePublish() {
+    if (!adminForm.fecha || !adminForm.deadlineDate || !adminForm.descripcion) return;
+    setSyncing(true);
+    const g = { ...adminForm, id: Date.now() };
+    const res = await gasPost({ action: 'publishGuardia', guardia: g });
+    if (res?.ok) {
+      setGuardia(g);
+      setSolicitudes([]);
+    }
+    setSyncing(false);
+  }
+
+  // ── ADMIN EXPORT CSV ──
+  function exportCSV() {
+    const rows = [['Pos.','Nombre','DNI','Turno','Categoría','Brigada','Email','Horas Acc.','Solicitado','Estado']];
+    const sorted = [...solicitudes].filter(s => !s.late)
+      .sort((a,b) => (a.horasAcc||0)-(b.horasAcc||0));
+    const late = solicitudes.filter(s => s.late);
+    [...sorted, ...late].forEach((s, i) => {
+      rows.push([
+        i+1, s.nombre, s.dni, s.turno, s.categoria, s.brifo, s.email,
+        s.horasAcc || 0,
+        new Date(s.appliedAt).toLocaleString('es-ES'),
+        s.late ? 'Fuera de plazo' : 'En plazo'
+      ]);
+    });
+    const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `solicitudes_${guardia?.fecha || 'guardia'}.csv`;
+    a.click();
+  }
+
+  // ── ADMIN UPDATE HOURS ──
+  async function updateHours(dni, hours) {
+    const key = normalizeDNI(dni);
+    const updated = { ...horasAcc, [key]: parseFloat(hours) || 0 };
+    setHorasAcc(updated);
+    await gasPost({ action: 'updateHoras', horas: updated });
+  }
+
+  const eligibility = getEligibility();
+  const priority = user && guardia ? getPriority() : null;
+  const myHours = user ? (horasAcc[normalizeDNI(user.dni)] || 0) : 0;
+  const countdownFmt = countdown !== null ? formatCountdown(countdown) : null;
+
+  const sortedApplicants = [...solicitudes]
+    .filter(s => !s.late)
+    .sort((a,b) => (a.horasAcc||0)-(b.horasAcc||0));
+  const lateApplicants = solicitudes.filter(s => s.late);
+
+  if (loading) return (
+    <div style={{minHeight:'100vh',background:'var(--dark)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16}}>
+      <div style={{fontSize:48}}>🔥</div>
+      <div style={{fontFamily:'Barlow Condensed',fontSize:22,color:'var(--text2)',letterSpacing:2}}>CARGANDO...</div>
+      <div style={{fontSize:13,color:'var(--text3)'}}>Conectando con el servidor</div>
+    </div>
+  );
+
+  return (
+    <div>
+      {/* HEADER */}
+      <header className="app-header">
+        <div className="header-inner">
+          <div className="header-logo">🔥</div>
+          <div className="header-titles">
+            <div className="header-title">{t.title}</div>
+            <div className="header-subtitle">{t.subtitle}</div>
+          </div>
+          <div className="header-lang">
+            <button className={`lang-btn ${lang==='es'?'active':''}`} onClick={()=>setLang('es')}>ES</button>
+            <button className={`lang-btn ${lang==='va'?'active':''}`} onClick={()=>setLang('va')}>VA</button>
+          </div>
+          <button className="admin-link" onClick={()=>setShowAdminModal(true)}>
+            {adminLoggedIn ? '⚙ Admin' : '⚙'}
+          </button>
+        </div>
+      </header>
+
+      {syncError && (
+        <div style={{background:'rgba(248,81,73,0.1)',borderBottom:'1px solid rgba(248,81,73,0.3)',padding:'8px 32px',fontSize:13,color:'var(--red)',display:'flex',alignItems:'center',gap:8}}>
+          ⚠ Error de conexión con el servidor.
+          <button onClick={loadAllData} style={{marginLeft:8,background:'none',border:'1px solid var(--red)',color:'var(--red)',borderRadius:4,padding:'2px 10px',cursor:'pointer',fontSize:12}}>Reintentar</button>
+        </div>
+      )}
+      {syncing && (
+        <div style={{background:'rgba(88,166,255,0.1)',borderBottom:'1px solid rgba(88,166,255,0.3)',padding:'6px 32px',fontSize:12,color:'var(--blue)'}}>
+          ⟳ Sincronizando...
+        </div>
+      )}
+      <main className="app-main">
+
+        {/* ── GUARDIA CARD ── */}
+        {guardia ? (
+          <div className={`guardia-card ${!isOpen ? 'closed' : ''}`}>
+            <div className={`guardia-badge ${!isOpen ? 'closed-badge' : ''}`}>
+              <span className="dot"></span>
+              {isOpen ? t.activeGuardia : t.closedGuardia}
+            </div>
+            <div className="guardia-title">{guardia.descripcion}</div>
+            <div className="guardia-grid">
+              <div className="guardia-field">
+                <div className="guardia-field-label">{t.date}</div>
+                <div className="guardia-field-value highlight">
+                  {new Date(guardia.fecha + 'T12:00:00').toLocaleDateString('es-ES', {weekday:'long',day:'2-digit',month:'long',year:'numeric'})}
+                </div>
+              </div>
+              <div className="guardia-field">
+                <div className="guardia-field-label">{t.start}</div>
+                <div className="guardia-field-value">{guardia.horaInicio}:00h</div>
+              </div>
+              <div className="guardia-field">
+                <div className="guardia-field-label">{t.duration}</div>
+                <div className="guardia-field-value">{guardia.duracion} {t.hours}</div>
+              </div>
+              <div className="guardia-field">
+                <div className="guardia-field-label">{t.needed}</div>
+                <div className="guardia-field-value">{solicitudes.filter(s=>!s.late).length} / {guardia.maxPersonas}</div>
+              </div>
+            </div>
+            <div className="deadline-bar">
+              <div>
+                <div className="deadline-label">{t.deadline}</div>
+                <div className="deadline-value">
+                  {new Date(guardia.deadlineDate + 'T12:00:00').toLocaleDateString('es-ES', {day:'2-digit',month:'2-digit',year:'numeric'})} – {guardia.deadlineHour}h
+                </div>
+              </div>
+              {countdownFmt && (
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  {countdown < 3600000 && countdown > 0 && <span style={{fontSize:12,color:'var(--red)'}}>{t.urgentSoon}</span>}
+                  <span className={`countdown ${countdownFmt.cls}`}>
+                    {countdown <= 0 ? (lang==='es'?'CERRADO':'TANCAT') : countdownFmt.text}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="no-guardia">
+            <div className="icon">🚒</div>
+            <h2>{t.noGuardia}</h2>
+            <p>{t.noGuardiaDesc}</p>
+          </div>
+        )}
+
+        {/* ── IDENTIFICATION ── */}
+        {!user && guardia && (
+          <div className="form-section">
+            <div className="form-section-title">{t.identify}</div>
+            <div className="form-row" style={{marginBottom:14}}>
+              <div className="form-group">
+                <label className="form-label">{t.yourDni}</label>
+                <input
+                  className={`form-input ${authError && authError !== t.wrongPin ? 'error' : ''}`}
+                  placeholder={t.dniPlaceholder}
+                  value={dniInput}
+                  onChange={e => setDniInput(e.target.value)}
+                  onKeyDown={e => e.key==='Enter' && handleLogin()}
+                  maxLength={15}
+                />
+              </div>
+              <div className="form-group" style={{maxWidth:140}}>
+                <label className="form-label">{t.yourPin}</label>
+                <input
+                  className={`form-input ${authError === t.wrongPin ? 'error' : ''}`}
+                  placeholder={t.pinPlaceholder}
+                  type="password"
+                  value={pinInput}
+                  onChange={e => setPinInput(e.target.value)}
+                  onKeyDown={e => e.key==='Enter' && handleLogin()}
+                  maxLength={5}
+                />
+              </div>
+            </div>
+            {authError && <div className="alert alert-red" style={{marginBottom:12}}><span className="alert-icon">⚠</span>{authError}</div>}
+            <button className="btn btn-primary" onClick={handleLogin}>{t.verify}</button>
+          </div>
+        )}
+
+        {/* ── USER PANEL ── */}
+        {user && guardia && (
+          <>
+            {/* User info bar */}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16,padding:'10px 16px',background:'var(--dark3)',borderRadius:8,border:'1px solid var(--border)'}}>
+              <div>
+                <div style={{fontWeight:600,fontSize:15}}>{user.nombre}</div>
+                <div style={{fontSize:12,color:'var(--text2)'}}>
+                  {lang==='es'?'Turno':'Torn'} {user.turno} · {user.brifo} · {user.categoria}
+                </div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontSize:12,color:'var(--text3)'}}>{t.accHours}</div>
+                <div style={{fontFamily:'Barlow Condensed',fontSize:22,fontWeight:700,color:'var(--gold)'}}>{myHours}h</div>
+              </div>
+            </div>
+
+            {/* Priority */}
+            {priority && eligibility?.ok && (
+              <div className="priority-box">
+                <div className="priority-rank">{priority.rank}<span>/{priority.total}</span></div>
+                <div className="priority-info">
+                  <div className="priority-name">{t.priority}</div>
+                  <div className="priority-hours">{lang==='es'?'Tienes':'Tens'} <strong>{myHours}h</strong> {t.hoursUnit}</div>
+                </div>
+              </div>
+            )}
+
+            {/* Eligibility */}
+            {eligibility && (
+              <div className={`alert ${eligibility.ok ? 'alert-green' : 'alert-red'}`} style={{marginBottom:16}}>
+                <span className="alert-icon">{eligibility.ok ? '✓' : '✕'}</span>
+                <div>
+                  <strong>{t.yourStatus}:</strong><br/>
+                  {eligibility.ok ? t.eligible : eligibility.reason}
+                </div>
+              </div>
+            )}
+
+            {/* Send button */}
+            {eligibility?.ok && (
+              <div className="form-section" style={{paddingTop:16,paddingBottom:16}}>
+                <div style={{fontSize:13,color:'var(--text2)',marginBottom:12}}>📧 {t.emailNote}</div>
+                <button className="btn btn-success" onClick={handleSendRequest}>
+                  🚒 {t.sendRequest}
+                </button>
+              </div>
+            )}
+
+            {/* My history */}
+            <div className="form-section" style={{marginTop:16}}>
+              <div className="form-section-title">{t.myHours}</div>
+              {Object.keys(horasAcc).length === 0 || !horasAcc[normalizeDNI(user.dni)] ? (
+                <p style={{color:'var(--text3)',fontSize:14}}>{t.noHistory}</p>
+              ) : (
+                <div style={{fontSize:15,color:'var(--text)'}}>
+                  {lang==='es'?'Horas acumuladas de guardias extraordinarias:':'Hores acumulades de guàrdies extraordinàries:'}{' '}
+                  <strong style={{color:'var(--gold)',fontSize:20}}>{horasAcc[normalizeDNI(user.dni)]}h</strong>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+      </main>
+
+      {/* ── ADMIN MODAL ── */}
+      {showAdminModal && (
+        <div className="modal-overlay" onClick={e => e.target===e.currentTarget && setShowAdminModal(false)}>
+          <div className="modal" style={{maxWidth: adminLoggedIn ? 900 : 400}}>
+            <button className="modal-close" onClick={()=>setShowAdminModal(false)}>✕</button>
+
+            {!adminLoggedIn ? (
+              <>
+                <div className="modal-title">🔒 {t.adminPanel}</div>
+                <div className="form-group" style={{marginBottom:14}}>
+                  <label className="form-label">{t.adminPass}</label>
+                  <input
+                    className={`form-input ${adminPassError?'error':''}`}
+                    type="password"
+                    value={adminPassInput}
+                    onChange={e=>setAdminPassInput(e.target.value)}
+                    onKeyDown={e=>{if(e.key==='Enter'){if(adminPassInput===ADMIN_PASS){setAdminLoggedIn(true);setAdminPassError('');}else{setAdminPassError(lang==='es'?'Contraseña incorrecta':'Contrasenya incorrecta');}}}}
+                    placeholder="••••••••"
+                  />
+                  {adminPassError && <div style={{fontSize:12,color:'var(--red)',marginTop:4}}>{adminPassError}</div>}
+                </div>
+                <button className="btn btn-primary" onClick={()=>{
+                  if(adminPassInput===ADMIN_PASS){setAdminLoggedIn(true);setAdminPassError('');}
+                  else setAdminPassError(lang==='es'?'Contraseña incorrecta':'Contrasenya incorrecta');
+                }}>{t.adminLogin}</button>
+              </>
+            ) : (
+              <>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+                  <div className="admin-title">⚙ {t.adminPanel}</div>
+                  <button className="btn btn-secondary" style={{padding:'6px 14px',fontSize:13}} onClick={()=>{setAdminLoggedIn(false);setAdminPassInput('');}}>{t.adminLogout}</button>
+                </div>
+
+                <div className="tabs">
+                  <button className={`tab ${adminTab==='applicants'?'active':''}`} onClick={()=>setAdminTab('applicants')}>{t.tabs_applicants} ({solicitudes.length})</button>
+                  <button className={`tab ${adminTab==='publish'?'active':''}`} onClick={()=>setAdminTab('publish')}>{t.tabs_publish}</button>
+                  <button className={`tab ${adminTab==='history'?'active':''}`} onClick={()=>setAdminTab('history')}>{t.history}</button>
+                </div>
+
+                {/* APPLICANTS TAB */}
+                {adminTab==='applicants' && (
+                  <>
+                    <div className="stats-row">
+                      <div className="stat-box"><div className="stat-label">{lang==='es'?'En plazo':'En termini'}</div><div className="stat-value green">{sortedApplicants.length}</div></div>
+                      <div className="stat-box"><div className="stat-label">{lang==='es'?'Fuera de plazo':'Fora de termini'}</div><div className="stat-value fire">{lateApplicants.length}</div></div>
+                      <div className="stat-box"><div className="stat-label">{lang==='es'?'Plazas restantes':'Places restants'}</div><div className="stat-value blue">{Math.max(0,(parseInt(guardia?.maxPersonas||0)-sortedApplicants.length))}</div></div>
+                    </div>
+                    {solicitudes.length === 0 ? (
+                      <p style={{color:'var(--text3)',textAlign:'center',padding:'30px 0'}}>{t.noApplicants}</p>
+                    ) : (
+                      <>
+                        <button className="btn btn-secondary" style={{marginBottom:12,fontSize:13,padding:'7px 16px'}} onClick={exportCSV}>📊 {t.exportExcel}</button>
+                        <div className="table-wrap">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>{t.rank}</th><th>{t.name}</th><th>{t.dni}</th>
+                                <th>{t.turn}</th><th>{t.category}</th>
+                                <th>{t.accHours}</th><th>{t.appliedAt}</th><th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {sortedApplicants.map((s,i)=>(
+                                <tr key={s.id}>
+                                  <td><strong style={{color:'var(--fire)'}}>{i+1}</strong></td>
+                                  <td style={{fontWeight:500}}>{s.nombre}</td>
+                                  <td style={{fontFamily:'monospace',fontSize:12}}>{s.dni}</td>
+                                  <td><span className="tag tag-blue">T{s.turno}</span></td>
+                                  <td><span className="tag tag-gray">{s.categoria}</span></td>
+                                  <td><strong style={{color:'var(--gold)'}}>{s.horasAcc||0}h</strong></td>
+                                  <td style={{fontSize:12,color:'var(--text2)'}}>{new Date(s.appliedAt).toLocaleString('es-ES')}</td>
+                                  <td><span className="tag tag-green">{lang==='es'?'En plazo':'En termini'}</span></td>
+                                </tr>
+                              ))}
+                              {lateApplicants.map((s,i)=>(
+                                <tr key={s.id} style={{opacity:0.6}}>
+                                  <td>–</td>
+                                  <td>{s.nombre}</td>
+                                  <td style={{fontFamily:'monospace',fontSize:12}}>{s.dni}</td>
+                                  <td><span className="tag tag-blue">T{s.turno}</span></td>
+                                  <td><span className="tag tag-gray">{s.categoria}</span></td>
+                                  <td>{s.horasAcc||0}h</td>
+                                  <td style={{fontSize:12,color:'var(--text2)'}}>{new Date(s.appliedAt).toLocaleString('es-ES')}</td>
+                                  <td><span className="tag tag-red">{t.late}</span></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+
+                {/* PUBLISH TAB */}
+                {adminTab==='publish' && (
+                  <div>
+                    <div className="form-row" style={{marginBottom:12}}>
+                      <div className="form-group" style={{flex:2}}>
+                        <label className="form-label">{t.description}</label>
+                        <input className="form-input" value={adminForm.descripcion}
+                          onChange={e=>setAdminForm({...adminForm,descripcion:e.target.value})}
+                          placeholder={lang==='es'?'Ej: Incendio forestal – Serra':'Ex: Incendi forestal – Serra'}/>
+                      </div>
+                    </div>
+                    <div className="form-row" style={{marginBottom:12}}>
+                      <div className="form-group">
+                        <label className="form-label">{t.dateField}</label>
+                        <input className="form-input" type="date" value={adminForm.fecha}
+                          onChange={e=>setAdminForm({...adminForm,fecha:e.target.value})}/>
+                      </div>
+                      <div className="form-group" style={{maxWidth:120}}>
+                        <label className="form-label">{t.startHour}</label>
+                        <input className="form-input" type="number" min="0" max="23" value={adminForm.horaInicio}
+                          onChange={e=>setAdminForm({...adminForm,horaInicio:e.target.value})}/>
+                      </div>
+                      <div className="form-group" style={{maxWidth:120}}>
+                        <label className="form-label">{t.durationH}</label>
+                        <input className="form-input" type="number" min="1" max="24" value={adminForm.duracion}
+                          onChange={e=>setAdminForm({...adminForm,duracion:e.target.value})}/>
+                      </div>
+                      <div className="form-group" style={{maxWidth:100}}>
+                        <label className="form-label">{t.maxPeople}</label>
+                        <input className="form-input" type="number" min="1" value={adminForm.maxPersonas}
+                          onChange={e=>setAdminForm({...adminForm,maxPersonas:e.target.value})}/>
+                      </div>
+                    </div>
+                    <div className="form-row" style={{marginBottom:16}}>
+                      <div className="form-group">
+                        <label className="form-label">{t.deadlineDate}</label>
+                        <input className="form-input" type="date" value={adminForm.deadlineDate}
+                          onChange={e=>setAdminForm({...adminForm,deadlineDate:e.target.value})}/>
+                      </div>
+                      <div className="form-group" style={{maxWidth:140}}>
+                        <label className="form-label">{t.deadlineHour}</label>
+                        <input className="form-input" type="time" value={adminForm.deadlineHour}
+                          onChange={e=>setAdminForm({...adminForm,deadlineHour:e.target.value})}/>
+                      </div>
+                    </div>
+                    <button className="btn btn-primary"
+                      onClick={handlePublish}
+                      disabled={!adminForm.fecha||!adminForm.deadlineDate||!adminForm.descripcion}>
+                      🚨 {guardia ? t.updateBtn : t.publishBtn}
+                    </button>
+                  </div>
+                )}
+
+                {/* HISTORY TAB */}
+                {adminTab==='history' && (
+                  <div>
+                    <p style={{fontSize:13,color:'var(--text2)',marginBottom:14}}>
+                      {lang==='es'
+                        ? 'Edita las horas acumuladas por persona. Estas horas determinan el orden de prioridad.'
+                        : 'Edita les hores acumulades per persona. Aquestes hores determinen l\'ordre de prioritat.'}
+                    </p>
+                    <div className="table-wrap" style={{maxHeight:400,overflowY:'auto'}}>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>{t.name}</th><th>{t.dni}</th><th>{t.turn}</th>
+                            <th>{t.totalHours}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {PERSONAL_DATA.slice(0,50).map(p=>(
+                            <tr key={p.id}>
+                              <td style={{fontSize:12}}>{p.nombre}</td>
+                              <td style={{fontFamily:'monospace',fontSize:11}}>{p.dni}</td>
+                              <td><span className="tag tag-blue">T{p.turno}</span></td>
+                              <td>
+                                <input
+                                  type="number" min="0" step="0.5"
+                                  value={horasAcc[normalizeDNI(p.dni)]||0}
+                                  onChange={e=>updateHours(p.dni,e.target.value)}
+                                  style={{
+                                    background:'var(--dark3)',border:'1px solid var(--border)',
+                                    borderRadius:4,color:'var(--text)',padding:'4px 8px',
+                                    width:70,fontSize:13
+                                  }}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p style={{fontSize:11,color:'var(--text3)',marginTop:8}}>
+                      {lang==='es'?`Mostrando primeros 50 de ${PERSONAL_DATA.length} efectivos`:`Mostrant primers 50 de ${PERSONAL_DATA.length} efectius`}
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      <footer className="app-footer">
+        Bombers de la Diputació de València · Sistema de Guardias Extraordinarias 2026
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+
+
+</body>
+</html>
